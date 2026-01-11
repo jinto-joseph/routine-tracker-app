@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Button Test</title>
+  <style>
+    body { padding: 20px; font-family: Arial, sans-serif; }
+    button { margin: 10px; padding: 10px 20px; font-size: 16px; }
+    .log { background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <h1>Button Test</h1>
+  <button id="testBtn1">Test Button 1 (onclick)</button>
+  <button id="testBtn2">Test Button 2 (addEventListener)</button>
+  <button id="themeToggle">🌙 Toggle Theme</button>
+  
+  <div id="log" class="log">
+    <h3>Log:</h3>
+    <div id="logContent">Click buttons to test...</div>
+  </div>
+
+  <script>
+    const log = document.getElementById('logContent');
+    
+    // Test 1: onclick
+    document.getElementById('testBtn1').onclick = function() {
+      log.innerHTML += '<br>✅ Button 1 clicked (onclick)';
+    };
+    
+    // Test 2: addEventListener
+    document.getElementById('testBtn2').addEventListener('click', function() {
+      log.innerHTML += '<br>✅ Button 2 clicked (addEventListener)';
+    });
+    
+    // Test 3: Theme toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    log.innerHTML += '<br>Current theme: ' + currentTheme;
+    
+    themeToggle.addEventListener('click', function() {
+      const theme = document.documentElement.getAttribute('data-theme');
+      const newTheme = theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      log.innerHTML += '<br>✅ Theme changed to: ' + newTheme;
+      themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+    });
+  </script>
+</body>
+</html>

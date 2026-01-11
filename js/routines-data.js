@@ -1,0 +1,421 @@
+// Embedded routines data as fallback
+// This ensures routines are always available even if fetch fails
+const embeddedRoutinesData = {
+  "daily": [
+    {
+      "name": "Wake up",
+      "goal": 0,
+      "defaultTime": "05:45",
+      "days": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"],
+      "category": "Morning"
+    },
+    {
+      "name": "Brushing & SAVERS",
+      "goal": 0,
+      "defaultTime": "05:45",
+      "days": ["monday", "tuesday", "wednesday", "thursday", "friday"],
+      "category": "Morning"
+    },
+    {
+      "name": "Brushing, SAVERS & Walk",
+      "goal": 0,
+      "defaultTime": "05:45",
+      "days": ["saturday", "sunday"],
+      "category": "Morning"
+    },
+    {
+      "name": "DSA Book Reading",
+      "goal": 30,
+      "defaultTime": "06:15",
+      "days": ["monday", "tuesday", "wednesday", "thursday", "friday"],
+      "category": "Study"
+    },
+    {
+      "name": "DSA Book Reading",
+      "goal": 30,
+      "defaultTime": "06:30",
+      "days": ["saturday"],
+      "category": "Study"
+    },
+    {
+      "name": "DSA Book Reading",
+      "goal": 25,
+      "defaultTime": "06:30",
+      "days": ["sunday"],
+      "category": "Study"
+    },
+    {
+      "name": "LeetCode",
+      "goal": 30,
+      "defaultTime": "06:45",
+      "days": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"],
+      "category": "Study"
+    },
+    {
+      "name": "HackerRank + Academics",
+      "goal": 30,
+      "defaultTime": "06:45",
+      "days": ["monday", "tuesday", "wednesday", "thursday", "friday"],
+      "category": "Study"
+    },
+    {
+      "name": "HackerRank + Academics",
+      "goal": 30,
+      "defaultTime": "06:45",
+      "days": ["saturday"],
+      "category": "Study"
+    },
+    {
+      "name": "Bath & Ablutions",
+      "goal": 0,
+      "defaultTime": "07:25",
+      "days": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"],
+      "category": "Morning"
+    },
+    {
+      "name": "Dress",
+      "goal": 0,
+      "defaultTime": "07:40",
+      "days": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"],
+      "category": "Morning"
+    },
+    {
+      "name": "Breakfast + Social Media",
+      "goal": 0,
+      "defaultTime": "07:45",
+      "days": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"],
+      "category": "Morning"
+    },
+    {
+      "name": "Breakfast",
+      "goal": 0,
+      "defaultTime": "07:45",
+      "days": ["sunday"],
+      "category": "Morning"
+    },
+    {
+      "name": "Bible & Prayer",
+      "goal": 0,
+      "defaultTime": "08:00",
+      "days": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"],
+      "category": "Spiritual"
+    },
+    {
+      "name": "Skincare + Social Media",
+      "goal": 0,
+      "defaultTime": "08:15",
+      "days": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"],
+      "category": "Morning"
+    },
+    {
+      "name": "Skincare",
+      "goal": 0,
+      "defaultTime": "08:15",
+      "days": ["sunday"],
+      "category": "Morning"
+    },
+    {
+      "name": "College Study",
+      "goal": 0,
+      "defaultTime": "08:30",
+      "days": ["monday", "tuesday", "wednesday", "thursday", "friday"],
+      "category": "Study"
+    },
+    {
+      "name": "CTC / Learning Tech",
+      "goal": 180,
+      "defaultTime": "08:30",
+      "days": ["saturday"],
+      "category": "Work"
+    },
+    {
+      "name": "DSA",
+      "goal": 120,
+      "defaultTime": "08:30",
+      "days": ["saturday"],
+      "category": "Study"
+    },
+    {
+      "name": "Church",
+      "goal": 0,
+      "defaultTime": "08:30",
+      "days": ["sunday"],
+      "category": "Spiritual"
+    },
+    {
+      "name": "Lunch Break + Social Media",
+      "goal": 0,
+      "defaultTime": "12:45",
+      "days": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"],
+      "category": "Break"
+    },
+    {
+      "name": "Lunch",
+      "goal": 0,
+      "defaultTime": "13:00",
+      "days": ["sunday"],
+      "category": "Break"
+    },
+    {
+      "name": "English Learning",
+      "goal": 25,
+      "defaultTime": "13:15",
+      "days": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"],
+      "category": "Language"
+    },
+    {
+      "name": "English Learning",
+      "goal": 25,
+      "defaultTime": "13:15",
+      "days": ["sunday"],
+      "category": "Language"
+    },
+    {
+      "name": "College + Study",
+      "goal": 0,
+      "defaultTime": "13:40",
+      "days": ["monday", "tuesday", "wednesday", "thursday", "friday"],
+      "category": "Study"
+    },
+    {
+      "name": "Hackathon",
+      "goal": 0,
+      "defaultTime": "14:00",
+      "days": ["monday", "tuesday", "wednesday", "thursday", "friday"],
+      "category": "Work"
+    },
+    {
+      "name": "CV Learning",
+      "goal": 0,
+      "defaultTime": "14:00",
+      "days": ["monday", "tuesday", "wednesday", "thursday", "friday"],
+      "category": "Study"
+    },
+    {
+      "name": "Academics",
+      "goal": 60,
+      "defaultTime": "11:30",
+      "days": ["wednesday"],
+      "category": "Study"
+    },
+    {
+      "name": "German Learning",
+      "goal": 30,
+      "defaultTime": "16:30",
+      "days": ["monday", "tuesday", "wednesday", "thursday", "friday"],
+      "category": "Language"
+    },
+    {
+      "name": "German Learning",
+      "goal": 60,
+      "defaultTime": "13:45",
+      "days": ["saturday"],
+      "category": "Language"
+    },
+    {
+      "name": "Leisure / German Study",
+      "goal": 60,
+      "defaultTime": "14:00",
+      "days": ["sunday"],
+      "category": "Personal"
+    },
+    {
+      "name": "Social Media",
+      "goal": 0,
+      "defaultTime": "16:00",
+      "days": ["sunday"],
+      "category": "Personal"
+    },
+    {
+      "name": "CTC / CTC-related work",
+      "goal": 150,
+      "defaultTime": "17:00",
+      "days": ["monday", "tuesday", "wednesday", "thursday", "friday"],
+      "category": "Work"
+    },
+    {
+      "name": "CTC / German",
+      "goal": 60,
+      "defaultTime": "13:45",
+      "days": ["saturday"],
+      "category": "Work"
+    },
+    {
+      "name": "Free Time",
+      "goal": 60,
+      "defaultTime": "16:00",
+      "days": ["saturday"],
+      "category": "Personal"
+    },
+    {
+      "name": "Drawing",
+      "goal": 60,
+      "defaultTime": "17:00",
+      "days": ["saturday"],
+      "category": "Personal"
+    },
+    {
+      "name": "Drawing",
+      "goal": 90,
+      "defaultTime": "16:15",
+      "days": ["sunday"],
+      "category": "Personal"
+    },
+    {
+      "name": "Weekly Learn",
+      "goal": 0,
+      "defaultTime": "12:00",
+      "days": ["sunday"],
+      "category": "Study"
+    },
+    {
+      "name": "Weekly Learn",
+      "goal": 120,
+      "defaultTime": "10:30",
+      "days": ["saturday"],
+      "category": "Study"
+    },
+    {
+      "name": "Leisure (German / Anything)",
+      "goal": 60,
+      "defaultTime": "14:00",
+      "days": ["saturday"],
+      "category": "Personal"
+    },
+    {
+      "name": "Outside",
+      "goal": 30,
+      "defaultTime": "16:30",
+      "days": ["saturday"],
+      "category": "Personal"
+    },
+    {
+      "name": "Supper + Social Media",
+      "goal": 0,
+      "defaultTime": "19:30",
+      "days": ["monday", "tuesday", "wednesday", "thursday", "friday"],
+      "category": "Break"
+    },
+    {
+      "name": "Academics",
+      "goal": 60,
+      "defaultTime": "19:00",
+      "days": ["saturday"],
+      "category": "Study"
+    },
+    {
+      "name": "Academics",
+      "goal": 150,
+      "defaultTime": "17:30",
+      "days": ["sunday"],
+      "category": "Study"
+    },
+    {
+      "name": "Bible & Prayer (Night)",
+      "goal": 0,
+      "defaultTime": "20:15",
+      "days": ["monday", "tuesday", "wednesday", "thursday", "friday"],
+      "category": "Spiritual"
+    },
+    {
+      "name": "Bible & Prayer (Night)",
+      "goal": 0,
+      "defaultTime": "20:00",
+      "days": ["saturday", "sunday"],
+      "category": "Spiritual"
+    },
+    {
+      "name": "Academics + Social Media",
+      "goal": 90,
+      "defaultTime": "20:30",
+      "days": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"],
+      "category": "Study"
+    },
+    {
+      "name": "DSA + Academics",
+      "goal": 90,
+      "defaultTime": "20:30",
+      "days": ["sunday"],
+      "category": "Study"
+    },
+    {
+      "name": "Learning Tech for career",
+      "goal": 90,
+      "defaultTime": "22:00",
+      "days": ["monday", "tuesday", "wednesday", "thursday", "friday"],
+      "category": "Study"
+    },
+    {
+      "name": "Weekly tech stuff",
+      "goal": 75,
+      "defaultTime": "22:00",
+      "days": ["saturday"],
+      "category": "Study"
+    },
+    {
+      "name": "Academics & Courses",
+      "goal": 90,
+      "defaultTime": "20:30",
+      "days": ["saturday"],
+      "category": "Study"
+    },
+    {
+      "name": "Book Reading",
+      "goal": 15,
+      "defaultTime": "23:30",
+      "days": ["monday", "tuesday", "wednesday", "thursday", "friday"],
+      "category": "Personal"
+    },
+    {
+      "name": "Book Reading",
+      "goal": 15,
+      "defaultTime": "23:15",
+      "days": ["saturday", "sunday"],
+      "category": "Personal"
+    },
+    {
+      "name": "Journaling",
+      "goal": 10,
+      "defaultTime": "23:45",
+      "days": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"],
+      "category": "Personal"
+    },
+    {
+      "name": "Journaling",
+      "goal": 15,
+      "defaultTime": "23:45",
+      "days": ["sunday"],
+      "category": "Personal"
+    },
+    {
+      "name": "Brushing (Night)",
+      "goal": 0,
+      "defaultTime": "23:55",
+      "days": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"],
+      "category": "Personal"
+    },
+    {
+      "name": "Sleep",
+      "goal": 0,
+      "defaultTime": "00:00",
+      "days": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"],
+      "category": "Personal"
+    }
+  ],
+  "weekly": [
+    {
+      "name": "Weekly Planning",
+      "goal": 0,
+      "defaultTime": "12:00",
+      "days": ["sunday"],
+      "category": "Planning"
+    },
+    {
+      "name": "Weekly Review",
+      "goal": 0,
+      "defaultTime": "06:30",
+      "days": ["sunday"],
+      "category": "Planning"
+    }
+  ]
+};
