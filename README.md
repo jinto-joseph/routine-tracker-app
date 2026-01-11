@@ -76,7 +76,7 @@ A comprehensive web-based habit tracking and productivity management application
 ### Option 1: Direct Use (No Installation Required)
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/habit-tracker.git
+git clone https://github.com/jinto-joseph/habit-tracker.git
 cd habit-tracker
 ```
 
@@ -316,8 +316,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 👨‍💻 Author
 
 **Your Name**
-- GitHub: [@yourusername](https://github.com/yourusername)
-- Email: your.email@example.com
+- GitHub: [@jinto-joseph](https://github.com/jinto-joseph)
+- Email: jintojoseph.jo@gmail.com
 
 ## 🙏 Acknowledgments
 
