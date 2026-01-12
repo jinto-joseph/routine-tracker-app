@@ -1,6 +1,8 @@
-# 🎯 Habit Tracker & Productivity Suite
+# 🎯 HabitFlow
 
 A comprehensive web-based habit tracking and productivity management application with Pomodoro timer, analytics, and calendar integration. Built as a Progressive Web App (PWA) for seamless offline use and mobile installation.
+
+**Build better habits. Track your progress. Achieve your goals.**
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Version](https://img.shields.io/badge/version-1.0.0-green.svg)
@@ -67,9 +69,19 @@ A comprehensive web-based habit tracking and productivity management application
 
 ### 💾 Data Management
 - **Local Storage**: All data stored locally in browser
+- **Cloud Sync**: Login to sync data across all your devices
+- **Multi-Device Support**: Access your habits from phone, tablet, laptop, or desktop
 - **Export/Import**: Export data as JSON for backup
 - **Auto-Save**: Automatic saving of all changes
 - **Data Persistence**: Routines and progress persist across sessions
+
+### ☁️ Cloud Sync (NEW!)
+- **Cross-Device Sync**: Access your data from any device
+- **User Accounts**: Secure login with username and password
+- **Auto-Sync**: Automatic sync every 5 minutes
+- **Manual Sync**: Upload/download data on demand
+- **Data Security**: Password hashing and user-specific storage
+- **Easy Setup**: Register once, login anywhere
 
 ## 🚀 Installation
 
@@ -103,20 +115,28 @@ Then navigate to `http://localhost:8000/routine-tracker/`
 4. Access from your home screen or app drawer
 
 ## 📖 Usage
-3. **No server required** - works directly from file system or local server
 
-### Using a Local Server (Recommended)
+### First-Time Setup (Onboarding Tour)
+When you first open HabitFlow, an **interactive tutorial** will guide you through all features:
+- Step-by-step walkthrough
+- Feature highlights
+- Visual guidance
+- Can be replayed anytime from the sidebar
 
-For best experience, use a local server:
+### Cloud Sync Setup (Sync Across Devices)
+1. **On First Device:**
+   - Click **"Cloud Sync"** in the sidebar
+   - Click **"Register"**
+   - Create username and password
+   - Your data is automatically uploaded ✅
 
-#### Python
-```bash
-# Python 3
-python -m http.server 8000
+2. **On Other Devices:**
+   - Click **"Cloud Sync"** in the sidebar
+   - Enter your username and password
+   - Click **"Login"**
+   - Your data automatically downloads ✅
 
-# Then open http://localhost:8000/routine-tracker/
-```
-
+**See [CLOUD_SYNC_GUIDE.md](CLOUD_SYNC_GUIDE.md) for detailed instructions**
 
 ### Setting Up Routines
 1. Click **"Edit Routines"** or **"Add Routines"** in the sidebar

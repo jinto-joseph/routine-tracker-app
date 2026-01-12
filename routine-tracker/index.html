@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Routine Tracker - Daily & Weekly Habits</title>
+  <title>HabitFlow - Daily Routine Tracker</title>
   
   <!-- PWA Meta Tags -->
-  <meta name="description" content="Track your daily and weekly habits, set reminders, and manage your routine schedule">
+  <meta name="description" content="Build better habits with HabitFlow. Track daily and weekly routines, set reminders, use Pomodoro timer, and view detailed analytics.">
   <meta name="theme-color" content="#2196f3">
   <link rel="manifest" href="./manifest.json">
   
   <!-- Apple Touch Icon -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Habit Tracker">
+  <meta name="apple-mobile-web-app-title" content="HabitFlow">
   <link rel="apple-touch-icon" href="../icon-192.png">
   
   <!-- Favicon -->
@@ -23,6 +23,7 @@
   <link rel="stylesheet" href="../libs/bootstrap-icons.css?v=2">
   <link rel="stylesheet" href="../css/style.css">
   <script src="../js/wellness-tracker.js"></script>
+  <script src="../js/cloud-sync.js"></script>
   <script>
     // Apply saved theme immediately in HEAD to prevent flash
     (function() {
@@ -34,9 +35,9 @@
 
 <body>
 <!-- Sidebar -->
-<div class="sidebar" id="sidebar">
+<div class="sidebar" id="sidebar">  
   <div class="sidebar-header">
-    <h5 class="mb-0"><i class="bi bi-calendar-check"></i> Routine Tracker</h5>
+    <h5 class="mb-0"><i class="bi bi-calendar-check"></i> HabitFlow</h5>
     <button class="btn-close-sidebar d-lg-none" id="closeSidebar">
       <i class="bi bi-x-lg"></i>
     </button>
@@ -70,6 +71,14 @@
     <button class="sidebar-link" id="exportBtnSidebar">
       <i class="bi bi-download"></i>
       <span>Export Data</span>
+    </button>
+    <button class="sidebar-link" id="cloudSyncBtn" onclick="cloudSync.showLoginModal()">
+      <i class="bi bi-cloud"></i>
+      <span>Cloud Sync</span>
+    </button>
+    <button class="sidebar-link" id="restartTourBtn" onclick="if(window.restartHabitFlowTour) window.restartHabitFlowTour()">
+      <i class="bi bi-play-circle"></i>
+      <span>Tutorial</span>
     </button>
   </nav>
   
@@ -132,9 +141,9 @@
   </div>
 
   <!-- Stats Cards -->
-  <div class="row mb-4">
+  <div class="row mb-4" id="statsCards">
     <div class="col-md-4">
-      <div class="stat-card">
+      <div class="stat-card" id="dailyProgressCard">
         <div class="stat-value" id="dailyProgressStat">0%</div>
         <div class="stat-label">Daily Progress</div>
       </div>
@@ -1101,6 +1110,24 @@
     updateOnlineStatus();
   }
 </script>
+
+<!-- Onboarding Tour - Load after everything else -->
+<script src="../js/onboarding-tour.js"></script>
+
+<!-- Footer -->
+<footer style="margin-top: 3rem; padding: 2rem 1rem; border-top: 1px solid var(--border-color); text-align: center; color: var(--text); opacity: 0.7;">
+  <div class="container">
+    <p style="margin-bottom: 0.5rem;">
+      &copy; 2026 HabitFlow. All rights reserved.
+    </p>
+    <p style="margin-bottom: 0; font-size: 0.9rem;">
+      <a href="mailto:jintojoseph.jo@gmail.com" style="color: var(--primary); text-decoration: none; font-size: 1.2rem;" title="Contact via email">
+        <i class="bi bi-envelope-fill"></i>
+      </a>
+    </p>
+  </div>
+</footer>
+
 </div><!-- End main-content -->
 </body>
 </html>

@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Analytics & Reports - Routine Tracker</title>
+  <title>Analytics & Reports - HabitFlow</title>
   <link href="../libs/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="../libs/bootstrap-icons.css?v=2">
   <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/cloud-sync.js"></script>
   <script src="../libs/chart.umd.js"></script>
   <script src="../js/routines-data.js"></script>
   <script src="../js/wellness-tracker.js"></script>
@@ -22,7 +23,7 @@
 <!-- Sidebar -->
 <div class="sidebar" id="sidebar">
   <div class="sidebar-header">
-    <h5 class="mb-0"><i class="bi bi-calendar-check"></i> Routine Tracker</h5>
+    <h5 class="mb-0"><i class="bi bi-calendar-check"></i> HabitFlow</h5>
     <button class="btn-close-sidebar d-lg-none" id="closeSidebar">
       <i class="bi bi-x-lg"></i>
     </button>
@@ -56,6 +57,10 @@
     <button class="sidebar-link" id="exportBtnSidebar">
       <i class="bi bi-download"></i>
       <span>Export Data</span>
+    </button>
+    <button class="sidebar-link" id="cloudSyncBtn" onclick="cloudSync.showLoginModal()">
+      <i class="bi bi-cloud"></i>
+      <span>Cloud Sync</span>
     </button>
   </nav>
   
@@ -481,4 +486,21 @@
   // Request notification permission
   if (Notification.permission === 'default') {
     Notification.requestPermission();
-  }
+  }</script>
+
+<!-- Footer -->
+<footer style="margin-top: 3rem; padding: 2rem 1rem; border-top: 1px solid var(--border-color); text-align: center; color: var(--text); opacity: 0.7;">
+  <div class="container">
+    <p style="margin-bottom: 0.5rem;">
+      &copy; 2026 HabitFlow. All rights reserved.
+    </p>
+    <p style="margin-bottom: 0; font-size: 0.9rem;">
+      <a href="mailto:jintojoseph.jo@gmail.com" style="color: var(--primary); text-decoration: none; font-size: 1.2rem;" title="Contact via email">
+        <i class="bi bi-envelope-fill"></i>
+      </a>
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

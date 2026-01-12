@@ -1,8 +1,8 @@
 {
-  "name": "Habit Tracker - Daily Routines",
-  "short_name": "Habit Tracker",
-  "id": "/Habit-Tracker-Productivity-Suite/",
-  "description": "Track your daily and weekly habits, set reminders, and manage your routine schedule",
+  "name": "HabitFlow - Daily Routine Tracker",
+  "short_name": "HabitFlow",
+  "id": "/HabitFlow/",
+  "description": "Build better habits with HabitFlow. Track daily and weekly routines, set reminders, use Pomodoro timer, and view detailed analytics.",
   "start_url": "./index.html",
   "scope": "/Habit-Tracker-Productivity-Suite/",
   "display": "standalone",

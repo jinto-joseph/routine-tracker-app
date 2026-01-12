@@ -105,7 +105,7 @@ function loadRoutines() {
   console.log('🔄 Loading routines...');
   
   // Data version for cache busting (increment when data structure changes)
-  const DATA_VERSION = 4; // Updated for Sleep time change to 23:59
+  const DATA_VERSION = 5; // Updated to clear all pre-existing routines for public release
   const cachedVersion = parseInt(localStorage.getItem('routinesDataVersion') || '0');
   
   // Try to load from localStorage first (faster, works offline)
@@ -394,16 +394,57 @@ function loadDailyRoutine(routines, savedData) {
   if (!routines || routines.length === 0) {
     const dayName = dayNames[currentDate.getDay()];
     const dayDisplay = dayName.charAt(0).toUpperCase() + dayName.slice(1);
-    routineBox.innerHTML = `
-      <div class="p-4 text-center">
-        <i class="bi bi-calendar-x" style="font-size: 3rem; color: var(--text); opacity: 0.5;"></i>
-        <p class="mt-3 text-muted">No routines scheduled for <strong>${dayDisplay}</strong></p>
-        <p class="text-muted small">Click "Edit Routines" to see all routines or "Add Routines" to create new ones.</p>
-        <button class="btn btn-primary btn-sm mt-2" onclick="reloadRoutines()">
-          <i class="bi bi-arrow-clockwise"></i> Reload Routines
-        </button>
-      </div>
-    `;
+    
+    // Check if this is likely a first-time user (no routines at all)
+    const isFirstTimeUser = !routinesData || !routinesData.daily || routinesData.daily.length === 0;
+    
+    if (isFirstTimeUser) {
+      routineBox.innerHTML = `
+        <div class="p-5 text-center" style="max-width: 600px; margin: 0 auto;">
+          <div style="font-size: 4rem; margin-bottom: 1.5rem;">🎯</div>
+          <h3 style="color: var(--primary); margin-bottom: 1rem;">Welcome to HabitFlow!</h3>
+          <p style="font-size: 1.1rem; color: var(--text); opacity: 0.8; margin-bottom: 2rem;">
+            Start building better habits today. Create your first routine to get started!
+          </p>
+          
+          <div class="card mb-4" style="text-align: left; background: var(--card-bg); border: 2px dashed var(--primary); opacity: 0.9;">
+            <div class="card-body">
+              <h5 class="card-title"><i class="bi bi-lightbulb"></i> Quick Start Guide</h5>
+              <ol class="mb-0" style="padding-left: 1.2rem;">
+                <li class="mb-2">Click <strong>"Add Routines"</strong> in the sidebar to create your daily or weekly habits</li>
+                <li class="mb-2">Set a <strong>name, time, and goal</strong> for each routine</li>
+                <li class="mb-2">Choose which <strong>days</strong> you want to practice this habit</li>
+                <li class="mb-2">Track your progress and build consistency!</li>
+              </ol>
+            </div>
+          </div>
+          
+          <button class="btn btn-lg btn-primary" onclick="document.getElementById('addRoutinesSidebar').click();" style="padding: 12px 36px; font-size: 1.1rem;">
+            <i class="bi bi-plus-circle"></i> Add Routines
+          </button>
+          
+          <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">
+            <p style="font-size: 0.9rem; color: var(--text); opacity: 0.6; margin-bottom: 0.5rem;">
+              <i class="bi bi-info-circle"></i> Need help getting started?
+            </p>
+            <button class="btn btn-sm btn-outline-secondary" onclick="if(window.restartHabitFlowTour) window.restartHabitFlowTour();">
+              <i class="bi bi-play-circle"></i> Replay Tutorial
+            </button>
+          </div>
+        </div>
+      `;
+    } else {
+      routineBox.innerHTML = `
+        <div class="p-4 text-center">
+          <i class="bi bi-calendar-x" style="font-size: 3rem; color: var(--text); opacity: 0.5;"></i>
+          <p class="mt-3 text-muted">No routines scheduled for <strong>${dayDisplay}</strong></p>
+          <p class="text-muted small">Click "Edit Routines" to manage your routines or "Add Routines" to create new ones.</p>
+          <button class="btn btn-primary btn-sm mt-2" onclick="reloadRoutines()">
+            <i class="bi bi-arrow-clockwise"></i> Reload Routines
+          </button>
+        </div>
+      `;
+    }
     return;
   }
   

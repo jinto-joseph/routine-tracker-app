@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test HabitFlow Tour</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #667eea;
+    }
+    .btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 10px 5px;
+    }
+    .btn:hover {
+      opacity: 0.9;
+    }
+    .info {
+      background: #e3f2fd;
+      padding: 15px;
+      border-radius: 6px;
+      margin: 20px 0;
+    }
+    code {
+      background: #f5f5f5;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎯 HabitFlow Tour Test Page</h1>
+    
+    <div class="info">
+      <h3>Tour Status</h3>
+      <p><strong>Completed:</strong> <span id="tourStatus">Loading...</span></p>
+      <p><strong>Current Page:</strong> Test Page (tour is designed for main app)</p>
+    </div>
+
+    <h3>🧪 Test Controls</h3>
+    <p>Use these buttons to test and debug the tour:</p>
+    
+    <button class="btn" onclick="checkTourStatus()">
+      📊 Check Tour Status
+    </button>
+    
+    <button class="btn" onclick="resetTour()">
+      🔄 Reset Tour (Mark as Not Completed)
+    </button>
+    
+    <button class="btn" onclick="markComplete()">
+      ✅ Mark Tour as Completed
+    </button>
+    
+    <button class="btn" onclick="openMainApp()">
+      🚀 Open Main App
+    </button>
+
+    <div class="info" style="margin-top: 30px;">
+      <h3>📝 How to Test the Tour</h3>
+      <ol>
+        <li>Click <strong>"Reset Tour"</strong> to clear the completion flag</li>
+        <li>Click <strong>"Open Main App"</strong> to go to the main application</li>
+        <li>The tour should start automatically after 2 seconds</li>
+        <li>If it doesn't start, check the browser console (F12) for errors</li>
+      </ol>
+    </div>
+
+    <div class="info">
+      <h3>🔍 Console Commands</h3>
+      <p>Open browser console (F12) and try these:</p>
+      <ul>
+        <li><code>window.restartHabitFlowTour()</code> - Restart tour and reload</li>
+        <li><code>window.habitFlowTour</code> - Access tour object</li>
+        <li><code>localStorage.getItem('habitflow_tour_completed')</code> - Check completion status</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    function checkTourStatus() {
+      const completed = localStorage.getItem('habitflow_tour_completed');
+      const status = completed === 'true' ? '✅ Completed' : '❌ Not Completed';
+      document.getElementById('tourStatus').textContent = status;
+      alert('Tour Status: ' + status);
+      console.log('habitflow_tour_completed =', completed);
+    }
+
+    function resetTour() {
+      localStorage.removeItem('habitflow_tour_completed');
+      checkTourStatus();
+      alert('✅ Tour has been reset! Open the main app to see it again.');
+    }
+
+    function markComplete() {
+      localStorage.setItem('habitflow_tour_completed', 'true');
+      checkTourStatus();
+      alert('✅ Tour marked as completed.');
+    }
+
+    function openMainApp() {
+      window.location.href = 'routine-tracker/index.html';
+    }
+
+    // Check status on load
+    window.onload = () => {
+      checkTourStatus();
+    };
+  </script>
+</body>
+</html>
