@@ -442,7 +442,7 @@ function loadDailyRoutine(routines, savedData) {
             </div>
             <div class="mt-1">
               <small class="text-muted">
-                <i class="bi bi-clock"></i> ${routine.defaultTime}
+                <i class="bi bi-clock"></i> ${routine.defaultTime === '00:00' ? '12:00 AM (next day)' : routine.defaultTime}
               </small>
             </div>
             ${timeInput}
