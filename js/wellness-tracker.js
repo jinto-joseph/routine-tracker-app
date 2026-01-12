@@ -155,7 +155,20 @@ class WellnessTracker {
 
   recordBedtime() {
     const now = new Date();
-    const dateKey = this.getDateKey(now);
+    
+    // If it's past midnight (12 AM - 4 AM), it's actually bedtime for the PREVIOUS day
+    // Example: Jan 13 at 12:30 AM is bedtime for Jan 12 night
+    let bedtimeDate;
+    if (now.getHours() >= 0 && now.getHours() < 4) {
+      // It's early morning (12 AM - 4 AM), so this is bedtime for yesterday
+      bedtimeDate = new Date(now);
+      bedtimeDate.setDate(bedtimeDate.getDate() - 1);
+    } else {
+      // It's regular daytime, use today's date
+      bedtimeDate = now;
+    }
+    
+    const dateKey = this.getDateKey(bedtimeDate);
     const wellnessData = JSON.parse(localStorage.getItem('wellnessData') || '{}');
     
     if (!wellnessData[dateKey]) {
@@ -170,7 +183,8 @@ class WellnessTracker {
     wellnessData[dateKey].bedtime = now.toISOString();
     localStorage.setItem('wellnessData', JSON.stringify(wellnessData));
     
-    alert('✅ Bedtime recorded! Good night! 😴');
+    const displayDate = bedtimeDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    alert(`✅ Bedtime recorded for ${displayDate}! Good night! 😴`);
   }
 
   recordWakeTime() {
@@ -189,13 +203,10 @@ class WellnessTracker {
     
     wellnessData[dateKey].wakeTime = now.toISOString();
     
-    // Calculate sleep hours from yesterday's bedtime to today's wake time
-    const yesterday = new Date(now);
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayKey = this.getDateKey(yesterday);
-    
-    if (wellnessData[yesterdayKey] && wellnessData[yesterdayKey].bedtime) {
-      const bedtime = new Date(wellnessData[yesterdayKey].bedtime);
+    // Calculate sleep hours from today's bedtime to today's wake time
+    // (bedtime was recorded when you went to sleep last night, which is stored under today's date)
+    if (wellnessData[dateKey] && wellnessData[dateKey].bedtime) {
+      const bedtime = new Date(wellnessData[dateKey].bedtime);
       const wakeTime = new Date(wellnessData[dateKey].wakeTime);
       const sleepHours = (wakeTime - bedtime) / (1000 * 60 * 60); // Convert to hours
       
@@ -203,7 +214,7 @@ class WellnessTracker {
       
       alert(`✅ Wake time recorded! You slept ${wellnessData[dateKey].sleepHours} hours. 😊`);
     } else {
-      alert('✅ Wake time recorded! (Bedtime not found for sleep calculation)');
+      alert('✅ Wake time recorded! (Bedtime not found - mark Sleep routine tonight at 12 AM)');
     }
     
     localStorage.setItem('wellnessData', JSON.stringify(wellnessData));
