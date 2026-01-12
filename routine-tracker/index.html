@@ -1051,11 +1051,11 @@
   renderMiniCalendar();
   updateSelectedDateDisplay();
   
-  // Auto-fix: Check if routines have old "Shavers" name and reload if needed
+  // Auto-fix: Check if routines have old data and reload if needed
   (function checkAndUpdateRoutines() {
     const saved = localStorage.getItem('routinesData');
-    if (saved && saved.includes('Shavers')) {
-      console.log('🔄 Detected old routine data, auto-updating to SAVERS...');
+    if (saved && (saved.includes('Shavers') || saved.includes('Brushing & SAVERS') || saved.includes('Brushing, SAVERS & Walk'))) {
+      console.log('🔄 Detected old routine data, auto-updating...');
       localStorage.removeItem('routinesData');
       location.reload();
     }
