@@ -722,16 +722,13 @@ function updateWellnessChart() {
   const textColor = isDark ? '#ffffff' : '#000000';
   const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
   
-  // Get last 7 days
-  const last7Days = [];
+  // Get today's date only
   const today = new Date();
-  for (let i = 6; i >= 0; i--) {
-    const date = new Date(today);
-    date.setDate(date.getDate() - i);
-    last7Days.push(date);
-  }
+  const dateKey = getDateKey(today);
   
   const allData = JSON.parse(localStorage.getItem('routineTracker') || '{}');
+  const todayData = allData[dateKey];
+  
   const wellnessMetrics = {
     exercise: 0,
     sleep: 0,
@@ -739,49 +736,41 @@ function updateWellnessChart() {
     hydration: 0
   };
   
-  // Track wellness-related routines for the week
-  last7Days.forEach(date => {
-    const dateKey = getDateKey(date);
-    const dayData = allData[dateKey];
-    const dayName = dayNames[date.getDay()];
-    const dayRoutines = getRoutinesForDay(dayName);
-    
-    if (dayData && dayData.daily && dayRoutines.length > 0) {
-      dayRoutines.forEach(routine => {
-        const routineId = `${routine.name}-${routine.defaultTime}`;
-        const savedRoutine = dayData.daily[routineId];
+  // Get today's routines
+  const dayName = dayNames[today.getDay()];
+  const todayRoutines = getRoutinesForDay(dayName);
+  
+  if (todayData && todayData.daily && todayRoutines.length > 0) {
+    todayRoutines.forEach(routine => {
+      const routineId = `${routine.name}-${routine.defaultTime}`;
+      const savedRoutine = todayData.daily[routineId];
+      
+      if (savedRoutine && savedRoutine.status === 'completed') {
+        const name = routine.name.toLowerCase();
         
-        if (savedRoutine && savedRoutine.status === 'completed') {
-          const name = routine.name.toLowerCase();
-          
-          // Exercise and Meditation tracked from SAVERS completion
-          if (name.includes('savers')) {
-            wellnessMetrics.exercise++;
-            wellnessMetrics.meditation++;
-          }
-          
-          // Sleep tracked from Wake up completion - calculate sleep hours
-          if (name.includes('wake up')) {
-            // Get wake up time from routine
-            const wakeTime = routine.defaultTime; // e.g., "05:45"
-            if (wakeTime) {
-              const [wakeHour, wakeMin] = wakeTime.split(':').map(Number);
-              // Assuming 8 hours of sleep (bedtime would be 8 hours before wake up)
-              // If wake up at 5:45, bedtime was 21:45 (9:45 PM)
-              // You can customize this calculation or add a bedtime routine
-              const sleepHours = 8; // Default assumption
-              wellnessMetrics.sleep += sleepHours;
-            }
-          }
-          
-          // Hydration tracked from water/drink routines
-          if (name.includes('water') || name.includes('hydrat') || name.includes('drink')) {
-            wellnessMetrics.hydration++;
+        // Exercise and Meditation tracked from SAVERS completion
+        if (name.includes('savers')) {
+          wellnessMetrics.exercise++;
+          wellnessMetrics.meditation++;
+        }
+        
+        // Sleep tracked from Wake up completion
+        if (name.includes('wake up')) {
+          const wakeTime = routine.defaultTime;
+          if (wakeTime) {
+            const [wakeHour, wakeMin] = wakeTime.split(':').map(Number);
+            const sleepHours = 8; // Default assumption
+            wellnessMetrics.sleep += sleepHours;
           }
         }
-      });
-    }
-  });
+        
+        // Hydration tracked from water/drink routines
+        if (name.includes('water') || name.includes('hydrat') || name.includes('drink')) {
+          wellnessMetrics.hydration++;
+        }
+      }
+    });
+  }
   
   if (wellnessChart) wellnessChart.destroy();
   
@@ -791,7 +780,7 @@ function updateWellnessChart() {
     data: {
       labels: ['Exercise (SAVERS)', 'Sleep (Hours)', 'Meditation (SAVERS)', 'Hydration (Glasses)'],
       datasets: [{
-        label: 'This Week',
+        label: 'Today',
         data: [
           wellnessMetrics.exercise,
           wellnessMetrics.sleep,

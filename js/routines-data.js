@@ -10,18 +10,25 @@ const embeddedRoutinesData = {
       "category": "Morning"
     },
     {
-      "name": "Brushing & SAVERS",
+      "name": "Brushing",
       "goal": 0,
       "defaultTime": "05:45",
-      "days": ["monday", "tuesday", "wednesday", "thursday", "friday"],
+      "days": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"],
       "category": "Morning"
     },
     {
-      "name": "Brushing, SAVERS & Walk",
+      "name": "SAVERS",
       "goal": 0,
-      "defaultTime": "05:45",
-      "days": ["saturday", "sunday"],
+      "defaultTime": "05:50",
+      "days": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"],
       "category": "Morning"
+    },
+    {
+      "name": "Walk",
+      "goal": 0,
+      "defaultTime": "06:00",
+      "days": ["saturday", "sunday"],
+      "category": "Exercise"
     },
     {
       "name": "DSA Book Reading",
