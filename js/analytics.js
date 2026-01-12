@@ -761,13 +761,24 @@ function updateWellnessChart() {
   
   if (wellnessChart) wellnessChart.destroy();
   
-  // Create individual point colors based on whether goals are met
+  // Create segment colors - green for met goals, red for unmet
   // Goals: Exercise >= 1, Sleep >= 6 hours, Meditation >= 1, Hydration >= 6 glasses
-  const pointColors = [
-    wellnessMetrics.exercise >= 1 ? 'rgba(76, 175, 80, 1)' : 'rgba(244, 67, 54, 1)',     // Exercise
-    wellnessMetrics.sleep >= 6 ? 'rgba(76, 175, 80, 1)' : 'rgba(244, 67, 54, 1)',        // Sleep
-    wellnessMetrics.meditation >= 1 ? 'rgba(76, 175, 80, 1)' : 'rgba(244, 67, 54, 1)',   // Meditation
-    wellnessMetrics.hydration >= 6 ? 'rgba(76, 175, 80, 1)' : 'rgba(244, 67, 54, 1)'     // Hydration
+  const exerciseMet = wellnessMetrics.exercise >= 1;
+  const sleepMet = wellnessMetrics.sleep >= 6;
+  const meditationMet = wellnessMetrics.meditation >= 1;
+  const hydrationMet = wellnessMetrics.hydration >= 6;
+  
+  // For segment coloring, we need to create separate datasets for green and red segments
+  // Each dataset will draw only the segments for its color
+  const greenSegments = [];
+  const redSegments = [];
+  
+  // Check each segment (between consecutive points in order: Exercise -> Sleep -> Meditation -> Hydration -> back to Exercise)
+  const segments = [
+    { from: 'exercise', to: 'sleep', met: exerciseMet && sleepMet },
+    { from: 'sleep', to: 'meditation', met: sleepMet && meditationMet },
+    { from: 'meditation', to: 'hydration', met: meditationMet && hydrationMet },
+    { from: 'hydration', to: 'exercise', met: hydrationMet && exerciseMet }
   ];
   
   const ctx = document.getElementById('wellnessChart').getContext('2d');
@@ -775,25 +786,46 @@ function updateWellnessChart() {
     type: 'radar',
     data: {
       labels: ['Exercise (SAVERS)', 'Sleep (Hours)', 'Meditation (SAVERS)', 'Hydration (Glasses)'],
-      datasets: [{
-        label: 'Today',
-        data: [
-          wellnessMetrics.exercise,
-          wellnessMetrics.sleep,
-          wellnessMetrics.meditation,
-          wellnessMetrics.hydration
-        ],
-        backgroundColor: 'rgba(76, 175, 80, 0.2)',
-        borderColor: 'rgba(76, 175, 80, 1)',
-        borderWidth: 2,
-        pointBackgroundColor: pointColors,
-        pointBorderColor: '#fff',
-        pointBorderWidth: 2,
-        pointRadius: 6,
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: pointColors,
-        pointHoverRadius: 8
-      }]
+      datasets: [
+        {
+          label: 'Goals Met',
+          data: [
+            wellnessMetrics.exercise,
+            wellnessMetrics.sleep,
+            wellnessMetrics.meditation,
+            wellnessMetrics.hydration
+          ],
+          backgroundColor: 'rgba(76, 175, 80, 0.1)',
+          borderColor: 'rgba(76, 175, 80, 1)',
+          borderWidth: 2,
+          segment: {
+            borderColor: (ctx) => {
+              // Color segments based on whether both connected points meet goals
+              const index = ctx.p0DataIndex;
+              const nextIndex = (index + 1) % 4;
+              const values = [exerciseMet, sleepMet, meditationMet, hydrationMet];
+              return (values[index] && values[nextIndex]) ? 'rgba(76, 175, 80, 1)' : 'rgba(244, 67, 54, 1)';
+            }
+          },
+          pointBackgroundColor: [
+            exerciseMet ? 'rgba(76, 175, 80, 1)' : 'rgba(244, 67, 54, 1)',
+            sleepMet ? 'rgba(76, 175, 80, 1)' : 'rgba(244, 67, 54, 1)',
+            meditationMet ? 'rgba(76, 175, 80, 1)' : 'rgba(244, 67, 54, 1)',
+            hydrationMet ? 'rgba(76, 175, 80, 1)' : 'rgba(244, 67, 54, 1)'
+          ],
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          pointRadius: 6,
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: [
+            exerciseMet ? 'rgba(76, 175, 80, 1)' : 'rgba(244, 67, 54, 1)',
+            sleepMet ? 'rgba(76, 175, 80, 1)' : 'rgba(244, 67, 54, 1)',
+            meditationMet ? 'rgba(76, 175, 80, 1)' : 'rgba(244, 67, 54, 1)',
+            hydrationMet ? 'rgba(76, 175, 80, 1)' : 'rgba(244, 67, 54, 1)'
+          ],
+          pointHoverRadius: 8
+        }
+      ]
     },
     options: {
       responsive: true,
