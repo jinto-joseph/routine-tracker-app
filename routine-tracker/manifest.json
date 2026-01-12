@@ -1,0 +1,33 @@
+{
+  "name": "Habit Tracker - Daily Routines",
+  "short_name": "Habit Tracker",
+  "id": "/Habit-Tracker-Productivity-Suite/",
+  "description": "Track your daily and weekly habits, set reminders, and manage your routine schedule",
+  "start_url": "./index.html",
+  "scope": "/Habit-Tracker-Productivity-Suite/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#2196f3",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "../icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "../icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "../icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["productivity", "lifestyle"]
+}

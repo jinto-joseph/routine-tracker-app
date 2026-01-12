@@ -85,3 +85,8 @@ coverage/
 # Misc
 *.orig
 .htaccess
+
+# Capacitor
+android/
+ios/
+capacitor.config.json

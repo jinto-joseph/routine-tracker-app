@@ -1,0 +1,25 @@
+{
+  "name": "habit-tracker",
+  "version": "1.0.0",
+  "description": "A comprehensive web-based habit tracking and productivity management application with Pomodoro timer, analytics, and calendar integration. Built as a Progressive Web App (PWA) for seamless offline use and mobile installation.",
+  "main": "sw.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jinto-joseph/Habit-Tracker-Productivity-Suite.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jinto-joseph/Habit-Tracker-Productivity-Suite/issues"
+  },
+  "homepage": "https://github.com/jinto-joseph/Habit-Tracker-Productivity-Suite#readme",
+  "dependencies": {
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/cli": "^8.0.0",
+    "@capacitor/core": "^8.0.0"
+  }
+}
