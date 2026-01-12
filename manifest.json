@@ -1,6 +1,7 @@
 {
   "name": "Habit Tracker - Daily Routines",
   "short_name": "Habit Tracker",
+  "id": "/",
   "description": "Track your daily and weekly habits, set reminders, and manage your routine schedule",
   "start_url": "./routine-tracker/index.html",
   "scope": "./",
@@ -13,37 +14,20 @@
       "src": "./icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "./icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
-  "categories": ["productivity", "lifestyle"],
-  "shortcuts": [
-    {
-      "name": "Daily Routines",
-      "short_name": "Home",
-      "description": "View and manage daily routines",
-      "url": "./routine-tracker/index.html",
-      "icons": [{ "src": "./icon-192x192.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Analytics",
-      "short_name": "Analytics",
-      "description": "View your progress analytics",
-      "url": "./routine-tracker/analytics.html",
-      "icons": [{ "src": "./icon-192x192.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Pomodoro Timer",
-      "short_name": "Pomodoro",
-      "description": "Start a pomodoro session",
-      "url": "./routine-tracker/pomodoro.html",
-      "icons": [{ "src": "./icon-192x192.png", "sizes": "192x192" }]
-    }
-  ]
+  "categories": ["productivity", "lifestyle"]
 }
