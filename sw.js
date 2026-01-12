@@ -1,5 +1,5 @@
 // Service Worker for Habit Tracker PWA
-const CACHE_NAME = 'habit-tracker-v5-offline';
+const CACHE_NAME = 'habit-tracker-v6-offline';
 const urlsToCache = [
   './',
   './routine-tracker/',
@@ -17,6 +17,7 @@ const urlsToCache = [
   './libs/bootstrap.min.css',
   './libs/bootstrap-icons.css',
   './libs/bootstrap-icons.woff2',
+  './libs/bootstrap-icons.woff',
   './libs/bootstrap.bundle.min.js',
   './libs/chart.umd.js',
   './study.mp3',
