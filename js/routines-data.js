@@ -404,7 +404,7 @@ const embeddedRoutinesData = {
     {
       "name": "Sleep",
       "goal": 0,
-      "defaultTime": "00:00",
+      "defaultTime": "23:59",
       "days": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"],
       "category": "Personal"
     }
