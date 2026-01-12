@@ -96,6 +96,8 @@ window.resetPomodoro = function() {
 
 function completeSession() {
   clearInterval(interval);
+  isRunning = false;
+  isPaused = false;
   
   // Play sound notification
   playNotificationSound();
@@ -103,7 +105,7 @@ function completeSession() {
   // Show browser notification
   if ('Notification' in window && Notification.permission === 'granted') {
     new Notification('Pomodoro Complete!', {
-      body: currentSessionType === 'pomodoro' 
+      body: currentSessionType === 'pomodoro' || currentSessionType === 'custom'
         ? 'Great work! Time for a break.' 
         : 'Break time is over. Ready to focus?',
       icon: '/favicon.ico'
@@ -129,12 +131,18 @@ function completeSession() {
     
     // Wait 3 seconds then switch and auto-start
     setTimeout(() => {
-      document.getElementById(breakType).checked = true;
+      const breakRadio = document.getElementById(breakType);
+      if (breakRadio) {
+        breakRadio.checked = true;
+      }
       currentSessionType = breakType;
       time = presets[breakType];
-      render();
-      // Auto-start the break session
       isRunning = true;
+      isPaused = false;
+      
+      render();
+      
+      // Auto-start the break session
       interval = setInterval(() => {
         if (time <= 0) {
           completeSession();
@@ -143,8 +151,11 @@ function completeSession() {
         time--;
         render();
       }, 1000);
-      document.getElementById('startBtn').style.display = 'none';
-      document.getElementById('pauseBtn').style.display = 'inline-block';
+      
+      const startBtn = document.getElementById('startBtn');
+      const pauseBtn = document.getElementById('pauseBtn');
+      if (startBtn) startBtn.style.display = 'none';
+      if (pauseBtn) pauseBtn.style.display = 'inline-block';
     }, 3000);
   } else if (currentSessionType === 'shortBreak' || currentSessionType === 'longBreak') {
     // Auto-start pomodoro after break
@@ -152,12 +163,18 @@ function completeSession() {
     
     // Wait 3 seconds then switch and auto-start
     setTimeout(() => {
-      document.getElementById('pomodoro').checked = true;
+      const pomodoroRadio = document.getElementById('pomodoro');
+      if (pomodoroRadio) {
+        pomodoroRadio.checked = true;
+      }
       currentSessionType = 'pomodoro';
       time = presets.pomodoro;
-      render();
-      // Auto-start the pomodoro session
       isRunning = true;
+      isPaused = false;
+      
+      render();
+      
+      // Auto-start the pomodoro session
       interval = setInterval(() => {
         if (time <= 0) {
           completeSession();
@@ -166,9 +183,16 @@ function completeSession() {
         time--;
         render();
       }, 1000);
-      document.getElementById('startBtn').style.display = 'none';
-      document.getElementById('pauseBtn').style.display = 'inline-block';
+      
+      const startBtn = document.getElementById('startBtn');
+      const pauseBtn = document.getElementById('pauseBtn');
+      if (startBtn) startBtn.style.display = 'none';
+      if (pauseBtn) pauseBtn.style.display = 'inline-block';
     }, 3000);
+  } else {
+    // Fallback: reset to pomodoro if unknown state
+    document.getElementById('startBtn').style.display = 'inline-block';
+    document.getElementById('pauseBtn').style.display = 'none';
   }
 }
 
