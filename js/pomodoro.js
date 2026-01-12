@@ -5,6 +5,7 @@ let isPaused = false;
 let sessionCount = 0;
 let currentSessionType = 'pomodoro';
 let pomodoroLapCount = 0; // Track pomodoro laps for long break
+let customTotalTime = 0; // Store custom timer total time for progress
 
 // Timer presets
 const presets = {
@@ -19,6 +20,11 @@ document.addEventListener('DOMContentLoaded', () => {
   loadSessionHistory();
   updateSessionType();
   render();
+  
+  // Request notification permission
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
 });
 
 function updateSessionType() {
@@ -188,16 +194,18 @@ function updateProgressRing() {
   if (!circle) return;
   
   const timerElement = document.getElementById('timer');
-  const selected = document.querySelector('input[name="sessionType"]:checked');
   let totalTime;
   
   if (currentSessionType === 'custom') {
-    const minutes = parseInt(document.getElementById('customMinutes').value) || 0;
-    const seconds = parseInt(document.getElementById('customSeconds').value) || 0;
-    totalTime = minutes * 60 + seconds;
-  } else if (selected) {
-    totalTime = presets[selected.value];
+    totalTime = customTotalTime; // Use stored custom time
   } else {
+    const selected = document.querySelector('input[name="sessionType"]:checked');
+    if (selected) {
+      totalTime = presets[selected.value];
+    } else {
+      totalTime = presets.pomodoro;
+    }
+  }
     return;
   }
   
@@ -245,6 +253,7 @@ window.setCustomTimer = function() {
   
   // Set the custom time
   time = minutes * 60 + seconds;
+  customTotalTime = time; // Store for progress tracking
   currentSessionType = 'custom';
   
   console.log('Custom time set to:', time, 'seconds');
@@ -278,7 +287,7 @@ function showNotificationMessage(message) {
 
 function playNotificationSound() {
   // Use different sounds for work and break sessions
-  const isBreak = currentMode.includes('break');
+  const isBreak = currentSessionType.includes('Break');
   const audioFile = isBreak ? '../break.mp3' : '../study.mp3';
   const audio = new Audio(audioFile);
   audio.volume = 0.7; // Set volume to 70%
@@ -304,7 +313,8 @@ function loadSessionCount() {
   sessionCount = data[today] || 0;
   const sessionCountEl = document.getElementById('sessionCount');
   if (sessionCountEl) {
-    sessionCountEl.textContent = `Sessions Today: ${sessionCount} | Lap: ${pomodoroLapCount % 4 + 1}/4`;
+    const currentLap = (pomodoroLapCount % 4) || 4;
+    sessionCountEl.textContent = `Sessions Today: ${sessionCount} | Lap: ${currentLap}/4`;
   }
 }
 
