@@ -761,6 +761,15 @@ function updateWellnessChart() {
   
   if (wellnessChart) wellnessChart.destroy();
   
+  // Create individual point colors based on whether goals are met
+  // Goals: Exercise >= 1, Sleep >= 6 hours, Meditation >= 1, Hydration >= 6 glasses
+  const pointColors = [
+    wellnessMetrics.exercise >= 1 ? 'rgba(76, 175, 80, 1)' : 'rgba(244, 67, 54, 1)',     // Exercise
+    wellnessMetrics.sleep >= 6 ? 'rgba(76, 175, 80, 1)' : 'rgba(244, 67, 54, 1)',        // Sleep
+    wellnessMetrics.meditation >= 1 ? 'rgba(76, 175, 80, 1)' : 'rgba(244, 67, 54, 1)',   // Meditation
+    wellnessMetrics.hydration >= 6 ? 'rgba(76, 175, 80, 1)' : 'rgba(244, 67, 54, 1)'     // Hydration
+  ];
+  
   const ctx = document.getElementById('wellnessChart').getContext('2d');
   wellnessChart = new Chart(ctx, {
     type: 'radar',
@@ -777,10 +786,13 @@ function updateWellnessChart() {
         backgroundColor: 'rgba(76, 175, 80, 0.2)',
         borderColor: 'rgba(76, 175, 80, 1)',
         borderWidth: 2,
-        pointBackgroundColor: 'rgba(76, 175, 80, 1)',
+        pointBackgroundColor: pointColors,
         pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        pointRadius: 6,
         pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgba(76, 175, 80, 1)'
+        pointHoverBorderColor: pointColors,
+        pointHoverRadius: 8
       }]
     },
     options: {
