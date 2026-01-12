@@ -65,6 +65,10 @@ class WellnessTracker {
   }
 
   showWaterReminder() {
+    // Get current water count before showing modal
+    const todayData = this.loadTodayData();
+    const currentWaterCount = todayData.waterIntake;
+    
     // Create modal for water reminder
     const modal = document.createElement('div');
     modal.className = 'modal fade';
@@ -93,7 +97,12 @@ class WellnessTracker {
               </button>
             </div>
             <div class="mt-3">
-              <small class="text-muted">Today's water intake: <span id="waterCount">0</span>/8 glasses</small>
+              <small class="text-muted">Today's water intake: <span id="waterCount">${currentWaterCount}</span>/8 glasses</small>
+              <div class="mt-2">
+                <small class="text-info d-block">💧 Reminder every 2 hours (8 AM - 10 PM)</small>
+                <small class="text-info">✅ Click "Yes" only if you just drank water</small>
+                <small class="text-info d-block">❌ Click "Skip" if you didn't drink</small>
+              </div>
             </div>
           </div>
         </div>
@@ -103,10 +112,6 @@ class WellnessTracker {
     document.body.appendChild(modal);
     const bsModal = new bootstrap.Modal(modal);
     bsModal.show();
-    
-    // Update water count display
-    const todayData = this.loadTodayData();
-    document.getElementById('waterCount').textContent = todayData.waterIntake;
     
     // Play notification sound
     this.playNotificationSound();
