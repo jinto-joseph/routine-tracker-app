@@ -1,10 +1,15 @@
 // Wellness Tracker - Water Reminders and Sleep Tracking
-// Water intake: Recommended 8 glasses per day, one every 2 hours during waking hours (8 AM - 10 PM = 14 hours = 7 reminders)
+// Water intake: 110ml every hour from 6:45 AM to 11:45 PM (17 hours = 18 reminders)
 
 class WellnessTracker {
   constructor() {
-    this.waterInterval = 2 * 60 * 60 * 1000; // 2 hours in milliseconds
+    this.waterInterval = 1 * 60 * 60 * 1000; // 1 hour in milliseconds
     this.waterReminderTimer = null;
+    this.startHour = 6; // 6 AM
+    this.startMinute = 45; // 45 minutes
+    this.endHour = 23; // 11 PM
+    this.endMinute = 45; // 45 minutes
+    this.waterAmount = 110; // ml
     this.init();
   }
 
@@ -21,6 +26,8 @@ class WellnessTracker {
     if (!wellnessData[dateKey]) {
       wellnessData[dateKey] = {
         waterIntake: 0,
+        waterSkipped: 0,
+        totalReminders: 0,
         bedtime: null,
         wakeTime: null,
         sleepHours: 0
@@ -36,38 +43,108 @@ class WellnessTracker {
   }
 
   startWaterReminders() {
-    // Check if we're in waking hours (8 AM - 10 PM)
+    // Check if we're in reminder hours (6:45 AM - 11:45 PM)
     const now = new Date();
     const hour = now.getHours();
+    const minute = now.getMinutes();
+    const currentTimeInMinutes = hour * 60 + minute;
+    const startTimeInMinutes = this.startHour * 60 + this.startMinute; // 6:45 AM = 405 min
+    const endTimeInMinutes = this.endHour * 60 + this.endMinute; // 11:45 PM = 1425 min
     
-    if (hour >= 8 && hour < 22) {
-      // Show first reminder after page load
-      setTimeout(() => this.showWaterReminder(), 5000); // 5 seconds after load
+    if (currentTimeInMinutes >= startTimeInMinutes && currentTimeInMinutes <= endTimeInMinutes) {
+      // Calculate next reminder time (next :45 minute mark)
+      const minutesUntilNext45 = 45 - minute;
+      const nextReminderDelay = minutesUntilNext45 > 0 && minutesUntilNext45 < 45 
+        ? minutesUntilNext45 * 60 * 1000 
+        : (60 - minute + 45) * 60 * 1000;
       
-      // Then show every 2 hours
-      this.waterReminderTimer = setInterval(() => {
-        const currentHour = new Date().getHours();
-        if (currentHour >= 8 && currentHour < 22) {
-          this.showWaterReminder();
-        }
-      }, this.waterInterval);
+      // Show first reminder at next :45 mark
+      setTimeout(() => {
+        this.showWaterReminder();
+        
+        // Then show every hour at :45
+        this.waterReminderTimer = setInterval(() => {
+          const current = new Date();
+          const currentMin = current.getHours() * 60 + current.getMinutes();
+          if (currentMin >= startTimeInMinutes && currentMin <= endTimeInMinutes && current.getMinutes() === 45) {
+            this.showWaterReminder();
+          }
+        }, this.waterInterval);
+      }, nextReminderDelay);
     } else {
-      // Schedule first reminder for 8 AM tomorrow
-      const tomorrow8AM = new Date();
-      tomorrow8AM.setHours(8, 0, 0, 0);
-      if (hour >= 22) {
-        tomorrow8AM.setDate(tomorrow8AM.getDate() + 1);
+      // Schedule first reminder for 6:45 AM tomorrow or today
+      const nextReminder = new Date();
+      nextReminder.setHours(this.startHour, this.startMinute, 0, 0);
+      if (currentTimeInMinutes > endTimeInMinutes) {
+        nextReminder.setDate(nextReminder.getDate() + 1);
       }
       
-      const timeUntil8AM = tomorrow8AM - now;
-      setTimeout(() => this.startWaterReminders(), timeUntil8AM);
+      const timeUntilNext = nextReminder - now;
+      setTimeout(() => this.startWaterReminders(), timeUntilNext);
     }
   }
 
   showWaterReminder() {
     // Get current water count before showing modal
     const todayData = this.loadTodayData();
-    const currentWaterCount = todayData.waterIntake;
+    const currentWaterCount = todayData.waterIntake || 0;
+    const skippedCount = todayData.waterSkipped || 0;
+    const totalReminders = todayData.totalReminders || 0;
+    
+    // Calculate how many reminders are left today
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+    const currentTimeInMinutes = currentHour * 60 + currentMinute;
+    const endTimeInMinutes = this.endHour * 60 + this.endMinute; // 11:45 PM
+    const remainingHours = Math.floor((endTimeInMinutes - currentTimeInMinutes) / 60);
+    const remainingReminders = Math.max(1, remainingHours + 1); // Including current reminder
+    
+    // Calculate deficit and recommended amount
+    const totalDailyGoal = 18; // 18 reminders per day
+    const expectedByNow = totalReminders + 1; // Including this reminder
+    const actualIntake = currentWaterCount;
+    const deficit = expectedByNow - actualIntake - 1; // How many were skipped
+    
+    let recommendedAmount = 110; // Default
+    let extraMessage = '';
+    
+    if (deficit > 0 && remainingReminders > 1) {
+      // Calculate extra amount to drink per remaining reminder
+      const missedWater = deficit * 110;
+      const extraPerReminder = Math.ceil(missedWater / remainingReminders);
+      recommendedAmount = 110 + extraPerReminder;
+      extraMessage = `
+        <div class="alert alert-warning mt-3 mb-0">
+          <i class="bi bi-exclamation-triangle"></i> 
+          <strong>Catch up needed!</strong><br>
+          <small>You missed ${deficit} reminder${deficit > 1 ? 's' : ''} (${missedWater}ml). 
+          Drink <strong>${recommendedAmount}ml</strong> now to stay on track!</small>
+        </div>
+      `;
+    } else if (deficit > 0 && remainingReminders === 1) {
+      // Last reminder of the day
+      const missedWater = deficit * 110;
+      recommendedAmount = 110 + missedWater;
+      extraMessage = `
+        <div class="alert alert-danger mt-3 mb-0">
+          <i class="bi bi-exclamation-circle"></i> 
+          <strong>Last chance!</strong><br>
+          <small>This is your last reminder. Drink <strong>${recommendedAmount}ml</strong> to meet today's goal!</small>
+        </div>
+      `;
+    } else if (actualIntake >= totalDailyGoal) {
+      extraMessage = `
+        <div class="alert alert-success mt-3 mb-0">
+          <i class="bi bi-check-circle"></i> 
+          <strong>Goal achieved! 🎉</strong><br>
+          <small>You've met your daily water goal. Great job!</small>
+        </div>
+      `;
+    }
+    
+    const totalIntakeML = currentWaterCount * 110;
+    const goalML = totalDailyGoal * 110;
     
     // Create modal for water reminder
     const modal = document.createElement('div');
@@ -87,7 +164,7 @@ class WellnessTracker {
               <i class="bi bi-droplet-fill text-primary" style="font-size: 4rem;"></i>
             </div>
             <h4>Time to hydrate! 💧</h4>
-            <p class="text-muted mb-4">Did you drink a glass of water?</p>
+            <p class="text-muted mb-2">Recommended amount: <strong>${recommendedAmount}ml</strong></p>
             <div class="d-flex justify-content-center gap-3">
               <button class="btn btn-success btn-lg" onclick="wellnessTracker.recordWater(true)">
                 <i class="bi bi-check-circle"></i> Yes
@@ -97,13 +174,15 @@ class WellnessTracker {
               </button>
             </div>
             <div class="mt-3">
-              <small class="text-muted">Today's water intake: <span id="waterCount">${currentWaterCount}</span>/8 glasses</small>
+              <small class="text-muted d-block">Today's progress: <span id="waterCount">${currentWaterCount}</span>/${totalDailyGoal} times</small>
+              <small class="text-muted d-block">${totalIntakeML}ml / ${goalML}ml (${Math.round((totalIntakeML/goalML)*100)}%)</small>
+              <small class="text-muted d-block">Remaining reminders: ${remainingReminders}</small>
               <div class="mt-2">
-                <small class="text-info d-block">💧 Reminder every 2 hours (8 AM - 10 PM)</small>
-                <small class="text-info">✅ Click "Yes" only if you just drank water</small>
-                <small class="text-info d-block">❌ Click "Skip" if you didn't drink</small>
+                <small class="text-info d-block">💧 Every hour at :45 (6:45 AM - 11:45 PM)</small>
+                <small class="text-info d-block">✅ Standard: 110ml | With catch-up: ${recommendedAmount}ml</small>
               </div>
             </div>
+            ${extraMessage}
           </div>
         </div>
       </div>
@@ -118,8 +197,11 @@ class WellnessTracker {
     
     // Browser notification
     if ('Notification' in window && Notification.permission === 'granted') {
+      const notifBody = deficit > 0 
+        ? `Catch up needed! Drink ${recommendedAmount}ml of water.`
+        : `Time to hydrate! Drink ${recommendedAmount}ml of water.`;
       new Notification('💧 Water Reminder', {
-        body: 'Time to hydrate! Drink a glass of water.',
+        body: notifBody,
         icon: '../icon-192.png'
       });
     }
@@ -132,14 +214,21 @@ class WellnessTracker {
     if (!wellnessData[dateKey]) {
       wellnessData[dateKey] = {
         waterIntake: 0,
+        waterSkipped: 0,
+        totalReminders: 0,
         bedtime: null,
         wakeTime: null,
         sleepHours: 0
       };
     }
     
+    // Track total reminders shown
+    wellnessData[dateKey].totalReminders = (wellnessData[dateKey].totalReminders || 0) + 1;
+    
     if (drank) {
       wellnessData[dateKey].waterIntake++;
+    } else {
+      wellnessData[dateKey].waterSkipped = (wellnessData[dateKey].waterSkipped || 0) + 1;
     }
     
     localStorage.setItem('wellnessData', JSON.stringify(wellnessData));

@@ -104,11 +104,15 @@ function updateCurrentDateDisplay() {
 function loadRoutines() {
   console.log('🔄 Loading routines...');
   
+  // Data version for cache busting (increment when data structure changes)
+  const DATA_VERSION = 4; // Updated for Sleep time change to 23:59
+  const cachedVersion = parseInt(localStorage.getItem('routinesDataVersion') || '0');
+  
   // Try to load from localStorage first (faster, works offline)
   const savedRoutines = loadRoutinesFromStorage();
-  if (savedRoutines && savedRoutines.daily && savedRoutines.daily.length > 0) {
+  if (savedRoutines && savedRoutines.daily && savedRoutines.daily.length > 0 && cachedVersion === DATA_VERSION) {
     routinesData = savedRoutines;
-    console.log(`✅ Loaded ${savedRoutines.daily.length} routines from localStorage`);
+    console.log(`✅ Loaded ${savedRoutines.daily.length} routines from localStorage (v${DATA_VERSION})`);
     
     // Set date and load immediately
     const today = new Date();
@@ -125,7 +129,8 @@ function loadRoutines() {
     // Use embedded routines as fallback
     routinesData = embeddedRoutinesData;
     localStorage.setItem('routinesData', JSON.stringify(embeddedRoutinesData));
-    console.log(`✅ Using embedded routines: ${embeddedRoutinesData.daily.length} routines`);
+    localStorage.setItem('routinesDataVersion', DATA_VERSION.toString());
+    console.log(`✅ Using embedded routines: ${embeddedRoutinesData.daily.length} routines (v${DATA_VERSION})`);
     
     const today = new Date();
     if (yearSelect && monthSelect && daySelect) {
@@ -155,9 +160,10 @@ function loadRoutines() {
       // Always use the file data (latest routines)
       routinesData = data;
       
-      // Update localStorage with latest routines from file
+      // Update localStorage with latest routines from file and version
       localStorage.setItem('routinesData', JSON.stringify(data));
-      console.log(`✅ Updated with ${data.daily.length} routines from file`);
+      localStorage.setItem('routinesDataVersion', DATA_VERSION.toString());
+      console.log(`✅ Updated with ${data.daily.length} routines from file (v${DATA_VERSION})`);
       
       // Reload the display with updated routines
       if (yearSelect && monthSelect && daySelect) {
@@ -175,6 +181,7 @@ function loadRoutines() {
         if (typeof embeddedRoutinesData !== 'undefined' && embeddedRoutinesData.daily) {
           routinesData = embeddedRoutinesData;
           localStorage.setItem('routinesData', JSON.stringify(embeddedRoutinesData));
+          localStorage.setItem('routinesDataVersion', DATA_VERSION.toString());
           console.log(`✅ Using embedded routines as fallback: ${embeddedRoutinesData.daily.length} routines`);
           loadDateData();
         } else {
@@ -319,6 +326,61 @@ function saveData(dateKey, data) {
   localStorage.setItem('routineTracker', JSON.stringify(allData));
 }
 
+// Filter routines: if multiple routines at same time, show only one based on status
+// Priority: if one has status (completed/missed), hide others without status at same time
+function filterRoutinesBySameTime(routines, savedData) {
+  if (!routines || routines.length === 0) return [];
+  
+  const timeGroups = {};
+  
+  // Group routines by time
+  routines.forEach(routine => {
+    const time = routine.defaultTime;
+    if (!timeGroups[time]) {
+      timeGroups[time] = [];
+    }
+    timeGroups[time].push(routine);
+  });
+  
+  const filtered = [];
+  
+  // For each time group, decide which routine(s) to show
+  Object.keys(timeGroups).forEach(time => {
+    const group = timeGroups[time];
+    
+    if (group.length === 1) {
+      // Only one routine at this time, always show it
+      filtered.push(group[0]);
+    } else {
+      // Multiple routines at same time
+      // Find if any has a status (completed or missed)
+      const withStatus = group.filter(routine => {
+        const routineId = `${routine.name}-${routine.defaultTime}`;
+        const saved = savedData[routineId] || {};
+        const status = saved.status || 'none';
+        return status === 'completed' || status === 'missed';
+      });
+      
+      if (withStatus.length > 0) {
+        // If one or more have status, show only the first one with status
+        filtered.push(withStatus[0]);
+      } else {
+        // None have status, show all of them
+        filtered.push(...group);
+      }
+    }
+  });
+  
+  // Sort by time again
+  return filtered.sort((a, b) => {
+    const timeA = a.defaultTime || "00:00";
+    const timeB = b.defaultTime || "00:00";
+    const sortTimeA = timeA === "00:00" ? "24:00" : timeA;
+    const sortTimeB = timeB === "00:00" ? "24:00" : timeB;
+    return sortTimeA.localeCompare(sortTimeB);
+  });
+}
+
 // Load daily routine
 function loadDailyRoutine(routines, savedData) {
   // Hide loading indicator
@@ -345,6 +407,9 @@ function loadDailyRoutine(routines, savedData) {
     return;
   }
   
+  // Filter routines: if multiple routines at same time, hide others if one has status
+  const filteredRoutines = filterRoutinesBySameTime(routines, savedData);
+  
   // Show day info header
   const dayName = dayNames[currentDate.getDay()];
   const dayDisplay = dayName.charAt(0).toUpperCase() + dayName.slice(1);
@@ -366,12 +431,12 @@ function loadDailyRoutine(routines, savedData) {
         <i class="bi bi-calendar3"></i> <strong>${dayDisplay}</strong> - ${dateStr}
         ${isToday ? '<span class="badge bg-success ms-2">Today</span>' : ''}
       </div>
-      <small class="text-muted">${routines.length} routine${routines.length !== 1 ? 's' : ''} scheduled</small>
+      <small class="text-muted">${filteredRoutines.length} routine${filteredRoutines.length !== 1 ? 's' : ''} scheduled</small>
     </div>
   `;
   routineBox.appendChild(headerInfo);
   
-  routines.forEach((routine, index) => {
+  filteredRoutines.forEach((routine, index) => {
     const routineId = `${routine.name}-${routine.defaultTime}`;
     const savedRoutine = savedData[routineId] || { completed: false, timeSpent: 0 };
     const isChecked = savedRoutine.completed;
@@ -442,7 +507,7 @@ function loadDailyRoutine(routines, savedData) {
             </div>
             <div class="mt-1">
               <small class="text-muted">
-                <i class="bi bi-clock"></i> ${routine.defaultTime === '00:00' ? '12:00 AM (next day)' : routine.defaultTime}
+                <i class="bi bi-clock"></i> ${routine.defaultTime}
               </small>
             </div>
             ${timeInput}
@@ -622,13 +687,16 @@ function updateStats(dayRoutines = null) {
     dayRoutines = getRoutinesForDay(dayName);
   }
   
+  // Filter routines to count only one per time slot
+  const filteredRoutines = filterRoutinesBySameTime(dayRoutines, savedData.daily || {});
+  
   // Daily progress - based on completion and goals
   let totalGoal = 0;
   let totalTimeSpent = 0;
   let completedCount = 0;
   let missedCount = 0;
   
-  dayRoutines.forEach(routine => {
+  filteredRoutines.forEach(routine => {
     const routineId = `${routine.name}-${routine.defaultTime}`;
     const savedRoutine = savedData.daily[routineId] || { completed: false, timeSpent: 0, status: 'none' };
     
@@ -648,7 +716,7 @@ function updateStats(dayRoutines = null) {
   
   // Calculate progress: 50% from completion, 50% from goal achievement
   // Penalize for missed routines: each missed routine reduces percentage
-  const totalRoutines = dayRoutines.length;
+  const totalRoutines = filteredRoutines.length;
   let completionPercent = 0;
   if (totalRoutines > 0) {
     // Base completion: (completed / total) * 100
@@ -665,7 +733,7 @@ function updateStats(dayRoutines = null) {
   
   progressBar.style.width = dailyPercent + "%";
   progressValue.textContent = dailyPercent + "%";
-  dailyCount.textContent = `${completedCount}/${dayRoutines.length}`;
+  dailyCount.textContent = `${completedCount}/${filteredRoutines.length}`;
   dailyProgressStat.textContent = dailyPercent + "%";
   
   // Weekly progress
