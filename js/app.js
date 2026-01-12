@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateCurrentDateDisplay();
   requestNotificationPermission(); // Request permission on load
   startReminderScheduler();
+  startAutoMissedChecker(); // Start auto-marking missed routines
 });
 
 // Initialize date selectors
@@ -680,6 +681,12 @@ function updateStats(dayRoutines = null) {
 }
 
 // Calculate current streak
+// Streak Calculation Logic:
+// - Counts consecutive days where at least 50% of routines were completed
+// - Starts from today and goes backwards through history
+// - Breaks when a day has less than 50% completion
+// - Days with no scheduled routines are skipped (not counted as break)
+// - Example: If you have 10 routines and complete 5+, the day counts toward streak
 function calculateStreak() {
   const allData = JSON.parse(localStorage.getItem('routineTracker') || '{}');
   let streak = 0;
@@ -703,16 +710,17 @@ function calculateStreak() {
         }
       });
       
+      // Day counts if at least 50% of routines are completed
       if (completedCount >= dayRoutines.length * 0.5) {
         streak++;
       } else {
-        break;
+        break; // Streak broken
       }
     } else if (dayRoutines.length === 0) {
-      // No routines for this day, skip it
+      // No routines for this day, skip it (don't break streak)
       continue;
     } else {
-      break;
+      break; // No data for this day, streak broken
     }
   }
   
@@ -1328,6 +1336,105 @@ window.selectAllDays = function() {
     document.getElementById(`day-${day}`).checked = true;
   });
 };
+
+// Auto-mark missed routines checker
+function startAutoMissedChecker() {
+  // Check every minute if routines should be auto-marked as missed
+  setInterval(() => {
+    autoMarkMissedRoutines();
+  }, 60000); // Run every 60 seconds
+  
+  // Also run immediately
+  autoMarkMissedRoutines();
+}
+
+function autoMarkMissedRoutines() {
+  // Only auto-mark for today
+  const today = new Date();
+  const todayKey = getDateKey(today);
+  
+  // Only check if we're viewing today
+  if (getDateKey(currentDate) !== todayKey) {
+    return;
+  }
+  
+  const now = new Date();
+  const currentHour = now.getHours();
+  const currentMinute = now.getMinutes();
+  const currentTimeInMinutes = currentHour * 60 + currentMinute;
+  
+  const dayName = dayNames[today.getDay()];
+  const todayRoutines = getRoutinesForDay(dayName);
+  
+  if (!todayRoutines || todayRoutines.length === 0) {
+    return;
+  }
+  
+  const savedData = getSavedData(todayKey);
+  savedData.daily = savedData.daily || {};
+  
+  let changed = false;
+  
+  // Sort routines by time to check them in order
+  const sortedRoutines = [...todayRoutines].sort((a, b) => {
+    const timeA = a.defaultTime || "00:00";
+    const timeB = b.defaultTime || "00:00";
+    return timeA.localeCompare(timeB);
+  });
+  
+  for (let i = 0; i < sortedRoutines.length; i++) {
+    const routine = sortedRoutines[i];
+    const routineId = `${routine.name}-${routine.defaultTime}`;
+    const routineTime = routine.defaultTime || "00:00";
+    const [routineHour, routineMinute] = routineTime.split(':').map(Number);
+    const routineTimeInMinutes = routineHour * 60 + routineMinute;
+    
+    // Check if the next routine has started
+    const nextRoutine = sortedRoutines[i + 1];
+    if (nextRoutine) {
+      const nextRoutineTime = nextRoutine.defaultTime || "00:00";
+      const [nextHour, nextMinute] = nextRoutineTime.split(':').map(Number);
+      const nextRoutineTimeInMinutes = nextHour * 60 + nextMinute;
+      
+      // If current time is past the routine time and the next routine has started
+      if (currentTimeInMinutes >= nextRoutineTimeInMinutes && currentTimeInMinutes > routineTimeInMinutes) {
+        const savedRoutine = savedData.daily[routineId];
+        
+        // Only auto-mark if not already marked (not completed, not missed, not marked as "none")
+        if (!savedRoutine || savedRoutine.status === 'none' || !savedRoutine.status) {
+          savedData.daily[routineId] = {
+            completed: false,
+            timeSpent: 0,
+            status: 'missed'
+          };
+          changed = true;
+          console.log(`⏱️ Auto-marked as missed: ${routine.name} (${routineTime})`);
+        }
+      }
+    } else {
+      // For the last routine of the day, mark as missed if it's more than 30 minutes past its time
+      if (currentTimeInMinutes > routineTimeInMinutes + 30) {
+        const savedRoutine = savedData.daily[routineId];
+        
+        if (!savedRoutine || savedRoutine.status === 'none' || !savedRoutine.status) {
+          savedData.daily[routineId] = {
+            completed: false,
+            timeSpent: 0,
+            status: 'missed'
+          };
+          changed = true;
+          console.log(`⏱️ Auto-marked as missed (last routine): ${routine.name} (${routineTime})`);
+        }
+      }
+    }
+  }
+  
+  // If any routines were auto-marked, save and reload
+  if (changed) {
+    saveData(todayKey, savedData);
+    loadDateData();
+  }
+}
 
 // Reload routines function
 window.reloadRoutines = function() {
