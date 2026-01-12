@@ -232,7 +232,7 @@ class WellnessTracker {
 
   playNotificationSound() {
     try {
-      const audio = new Audio('../tone2pi.mp3');
+      const audio = new Audio('../water.mp3');
       audio.play().catch(err => console.log('Audio play failed:', err));
     } catch (err) {
       console.log('Audio creation failed:', err);

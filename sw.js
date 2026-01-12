@@ -1,5 +1,5 @@
 // Service Worker for Habit Tracker PWA
-const CACHE_NAME = 'habit-tracker-v1';
+const CACHE_NAME = 'habit-tracker-v2';
 const urlsToCache = [
   '/routine-tracker/index.html',
   '/routine-tracker/analytics.html',
@@ -9,7 +9,11 @@ const urlsToCache = [
   '/js/analytics.js',
   '/js/pomodoro.js',
   '/js/routines-data.js',
+  '/js/wellness-tracker.js',
   '/data/routines.json',
+  '/study.mp3',
+  '/break.mp3',
+  '/water.mp3',
   '/tone2pi.mp3',
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css',
   'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css',
@@ -94,3 +98,30 @@ function syncData() {
   // Data is stored in localStorage, so it will persist
   return Promise.resolve();
 }
+
+// Handle notification clicks
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  
+  event.waitUntil(
+    clients.openWindow('/routine-tracker/index.html')
+  );
+});
+
+// Enable background notifications
+self.addEventListener('push', event => {
+  if (event.data) {
+    const data = event.data.json();
+    const options = {
+      body: data.body,
+      icon: '/icon-192.png',
+      badge: '/icon-192.png',
+      vibrate: [200, 100, 200],
+      requireInteraction: true
+    };
+    
+    event.waitUntil(
+      self.registration.showNotification(data.title, options)
+    );
+  }
+});

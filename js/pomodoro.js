@@ -277,8 +277,10 @@ function showNotificationMessage(message) {
 }
 
 function playNotificationSound() {
-  // Play the tone2pi.mp3 audio file
-  const audio = new Audio('../tone2pi.mp3');
+  // Use different sounds for work and break sessions
+  const isBreak = currentMode.includes('break');
+  const audioFile = isBreak ? '../break.mp3' : '../study.mp3';
+  const audio = new Audio(audioFile);
   audio.volume = 0.7; // Set volume to 70%
   audio.play().catch(err => {
     console.error('Error playing notification sound:', err);

@@ -894,8 +894,8 @@ function showBrowserNotification(title, body, isAlarm = false) {
 
 // Sound functions
 function playAlarmSound() {
-  // Play tone2pi.mp3 for all reminder sounds
-  const audio = new Audio('../tone2pi.mp3');
+  // Play study.mp3 for all routine reminders
+  const audio = new Audio('../study.mp3');
   audio.volume = 0.7;
   audio.play().catch(err => {
     console.error('Error playing alarm sound:', err);
@@ -930,7 +930,7 @@ function playBeepFallback() {
 }
 
 function playReminderSound() {
-  // Use same tone2pi.mp3 for reminders
+  // Use study.mp3 for event reminders
   playAlarmSound();
 }
 
