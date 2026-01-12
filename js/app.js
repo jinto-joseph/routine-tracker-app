@@ -521,6 +521,25 @@ window.markRoutineStatus = function(index, routineId, status) {
   
   saveData(dateKey, savedData);
   
+  // Special handling for wellness tracking
+  if (status === 'completed') {
+    const routineName = routineId.split('-').slice(0, -1).join('-'); // Remove time part
+    
+    // Track bedtime when Sleep routine is marked complete
+    if (routineName.toLowerCase().includes('sleep')) {
+      if (typeof wellnessTracker !== 'undefined') {
+        wellnessTracker.recordBedtime();
+      }
+    }
+    
+    // Track wake time when Wake up routine is marked complete
+    if (routineName.toLowerCase().includes('wake up')) {
+      if (typeof wellnessTracker !== 'undefined') {
+        wellnessTracker.recordWakeTime();
+      }
+    }
+  }
+  
   // Reload to update UI
   loadDateData();
   

@@ -722,21 +722,23 @@ function updateWellnessChart() {
   const textColor = isDark ? '#ffffff' : '#000000';
   const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
   
-  // Get today's date only
+  // Get today's date
   const today = new Date();
   const dateKey = getDateKey(today);
   
   const allData = JSON.parse(localStorage.getItem('routineTracker') || '{}');
   const todayData = allData[dateKey];
+  const wellnessData = JSON.parse(localStorage.getItem('wellnessData') || '{}');
+  const todayWellness = wellnessData[dateKey] || { waterIntake: 0, sleepHours: 0 };
   
   const wellnessMetrics = {
     exercise: 0,
-    sleep: 0,
+    sleep: todayWellness.sleepHours || 0, // Use actual tracked sleep
     meditation: 0,
-    hydration: 0
+    hydration: todayWellness.waterIntake || 0 // Use actual tracked water intake
   };
   
-  // Get today's routines
+  // Get today's routines for SAVERS tracking
   const dayName = dayNames[today.getDay()];
   const todayRoutines = getRoutinesForDay(dayName);
   
@@ -752,21 +754,6 @@ function updateWellnessChart() {
         if (name.includes('savers')) {
           wellnessMetrics.exercise++;
           wellnessMetrics.meditation++;
-        }
-        
-        // Sleep tracked from Wake up completion
-        if (name.includes('wake up')) {
-          const wakeTime = routine.defaultTime;
-          if (wakeTime) {
-            const [wakeHour, wakeMin] = wakeTime.split(':').map(Number);
-            const sleepHours = 8; // Default assumption
-            wellnessMetrics.sleep += sleepHours;
-          }
-        }
-        
-        // Hydration tracked from water/drink routines
-        if (name.includes('water') || name.includes('hydrat') || name.includes('drink')) {
-          wellnessMetrics.hydration++;
         }
       }
     });
