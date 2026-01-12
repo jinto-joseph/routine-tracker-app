@@ -92,7 +92,7 @@ class WellnessTracker {
               <button class="btn btn-success btn-lg" onclick="wellnessTracker.recordWater(true)">
                 <i class="bi bi-check-circle"></i> Yes
               </button>
-              <button class="btn btn-secondary btn-lg" onclick="wellnessTracker.recordWater(false)">
+              <button class="btn btn-danger btn-lg" onclick="wellnessTracker.recordWater(false)">
                 <i class="bi bi-x-circle"></i> Skip
               </button>
             </div>
