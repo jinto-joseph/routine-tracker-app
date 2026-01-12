@@ -206,8 +206,6 @@ function updateProgressRing() {
       totalTime = presets.pomodoro;
     }
   }
-    return;
-  }
   
   const remaining = time;
   const progress = totalTime > 0 ? ((totalTime - remaining) / totalTime) : 0;
