@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biofeedback Intelligence - HabitFlow</title>
+  <link href="../libs/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../libs/bootstrap-icons.css?v=2">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/cloud-sync.js"></script>
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+  <style>
+    /* ── Page-specific styles ── */
+    .bio-hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+      border-radius: 16px;
+      padding: 2.5rem;
+      margin-bottom: 2rem;
+      position: relative;
+      overflow: hidden;
+      color: white;
+    }
+    .bio-hero::before {
+      content: '';
+      position: absolute;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(99,102,241,0.3) 0%, transparent 70%);
+      top: -100px; right: -100px;
+      border-radius: 50%;
+    }
+    .bio-hero::after {
+      content: '';
+      position: absolute;
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(16,185,129,0.2) 0%, transparent 70%);
+      bottom: -80px; left: 50px;
+      border-radius: 50%;
+    }
+    .bio-hero-content { position: relative; z-index: 1; }
+    .bio-hero h1 { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .bio-hero p { opacity: 0.8; font-size: 1.05rem; margin-bottom: 0; }
+    .bio-badge {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 20px; padding: 0.3rem 0.9rem; font-size: 0.8rem;
+      margin-bottom: 1rem;
+    }
+
+    /* Stat strip */
+    .bf-stats-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .bf-stat {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.25rem 1rem;
+      text-align: center;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    .bf-stat::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: var(--gradient-primary);
+    }
+    .bf-stat-value {
+      font-size: 1.6rem; font-weight: 700;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .bf-stat-label { font-size: 0.75rem; color: var(--text); opacity: 0.65; margin-top: 0.25rem; }
+
+    /* Bio System Cards */
+    .bio-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.25rem;
+      box-shadow: var(--shadow);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .bio-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+    .bio-card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }
+    .bio-icon { font-size: 1.8rem; }
+    .bio-habit-name { font-weight: 600; font-size: 0.95rem; color: var(--text); }
+    .bio-systems-label { font-size: 0.7rem; opacity: 0.6; color: var(--text); }
+    .bio-systems-list { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.75rem; }
+    .bio-tag {
+      font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 12px;
+      font-weight: 500;
+    }
+    .bio-markers { margin-bottom: 0.75rem; }
+    .bio-markers-title { font-size: 0.7rem; font-weight: 600; opacity: 0.5; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text); margin-bottom: 0.3rem; }
+    .bio-markers-list { margin: 0; padding-left: 1rem; font-size: 0.78rem; color: var(--text); opacity: 0.8; }
+    .bio-markers-list li { margin-bottom: 0.15rem; }
+    .bio-insight {
+      font-size: 0.78rem; font-style: italic;
+      background: var(--hover); border-radius: 8px; padding: 0.5rem 0.75rem;
+      color: var(--text); opacity: 0.85;
+      display: flex; gap: 0.5rem; align-items: flex-start;
+    }
+
+    /* Section headers */
+    .section-header {
+      display: flex; align-items: center; gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid var(--border);
+    }
+    .section-header-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+    }
+    .section-title { font-size: 1.2rem; font-weight: 700; color: var(--text); margin: 0; }
+    .section-subtitle { font-size: 0.8rem; opacity: 0.6; color: var(--text); margin: 0; }
+
+    /* Trend canvas area */
+    .trend-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+    }
+    .trend-row { display: flex; gap: 2rem; flex-wrap: wrap; }
+    .trend-canvas-wrap { flex: 1; min-width: 200px; }
+    .trend-label { font-size: 0.8rem; opacity: 0.6; margin-bottom: 0.5rem; color: var(--text); }
+    #trendCanvas { width: 100%; height: 80px; border-radius: 8px; }
+
+    /* Projected bars */
+    .proj-bar-wrap {
+      display: flex; align-items: center; gap: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+    .proj-bar-label { font-size: 0.75rem; width: 35px; opacity: 0.7; color: var(--text); }
+    .proj-bar-track {
+      flex: 1; height: 12px; background: var(--hover); border-radius: 6px; overflow: hidden;
+    }
+    .proj-bar-fill { height: 100%; border-radius: 6px; transition: width 0.8s ease; }
+    .proj-bar-value { font-size: 0.75rem; width: 32px; text-align: right; opacity: 0.8; color: var(--text); font-weight: 600; }
+
+    /* AI Panel */
+    .ai-run-btn {
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+      border: none; color: white; padding: 0.85rem 2rem;
+      border-radius: 12px; font-weight: 600; font-size: 1rem;
+      cursor: pointer; transition: all 0.3s ease;
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      box-shadow: 0 4px 20px rgba(99,102,241,0.35);
+    }
+    .ai-run-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(99,102,241,0.5); }
+    .ai-run-btn:disabled { opacity: 0.7; transform: none; }
+
+    .ai-panel-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .ai-insight-card {
+      background: var(--hover);
+      border-radius: 10px; padding: 1rem; margin-bottom: 1rem;
+    }
+    .ai-insight-header {
+      display: flex; align-items: center; gap: 0.5rem;
+      margin-bottom: 0.5rem; font-size: 0.9rem;
+    }
+    .ai-insight-text { font-size: 0.88rem; color: var(--text); margin: 0; line-height: 1.6; }
+
+    /* Overall assessment */
+    #ai-overall {
+      background: linear-gradient(135deg, rgba(99,102,241,0.1) 0%, rgba(139,92,246,0.1) 100%);
+      border: 1px solid rgba(99,102,241,0.2);
+      border-radius: 12px; padding: 1.25rem;
+      font-size: 0.95rem; line-height: 1.7;
+      color: var(--text); margin-bottom: 1.5rem;
+      font-style: italic;
+    }
+
+    /* Alerts */
+    .bio-alert {
+      border-radius: 10px; padding: 1rem 1.25rem;
+      display: flex; align-items: flex-start; gap: 0.5rem;
+      font-size: 0.88rem; line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+    .bio-alert-warning { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); color: var(--text); }
+    .bio-alert-warning i { color: #f59e0b; }
+    .bio-alert-success { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: var(--text); }
+    .bio-alert-success i { color: #10b981; }
+
+    /* Predictions table */
+    .prediction-row {
+      display: grid; grid-template-columns: 1.5fr 1fr 2fr;
+      gap: 0.75rem; align-items: center;
+      padding: 0.75rem 0; border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+    .prediction-row:last-child { border-bottom: none; }
+    .prediction-metric { font-weight: 600; color: var(--text); }
+    .prediction-trend { font-weight: 600; text-transform: capitalize; }
+    .prediction-reason { color: var(--text); opacity: 0.75; }
+
+    /* Action items */
+    .action-item {
+      display: flex; gap: 1rem; align-items: flex-start;
+      padding: 1rem; background: var(--hover); border-radius: 10px;
+      margin-bottom: 0.75rem;
+    }
+    .action-num {
+      width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+      background: var(--gradient-primary); color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; font-weight: 700;
+    }
+    .action-text { font-size: 0.88rem; color: var(--text); line-height: 1.6; }
+
+    /* AI CTA card */
+    .ai-cta-card {
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+      border-radius: 14px; padding: 2rem;
+      text-align: center; color: white;
+      margin-bottom: 2rem;
+    }
+    .ai-cta-card h4 { font-weight: 700; margin-bottom: 0.5rem; }
+    .ai-cta-card p { opacity: 0.75; font-size: 0.9rem; margin-bottom: 1.5rem; }
+
+    /* Tabs */
+    .bio-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .bio-tab {
+      padding: 0.5rem 1.25rem; border-radius: 20px; font-size: 0.85rem; font-weight: 500;
+      cursor: pointer; border: 2px solid var(--border); background: var(--card);
+      color: var(--text); transition: all 0.2s ease;
+    }
+    .bio-tab.active {
+      background: var(--gradient-primary); color: white; border-color: transparent;
+      box-shadow: 0 4px 12px rgba(33,150,243,0.3);
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center; padding: 3rem 1.5rem;
+      background: var(--card); border-radius: 14px; border: 2px dashed var(--border);
+    }
+    .empty-state .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .bio-hero h1 { font-size: 1.5rem; }
+      .prediction-row { grid-template-columns: 1fr 1fr; }
+      .prediction-reason { grid-column: 1 / -1; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Sidebar (same structure as other pages) -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <h5 class="mb-0"><i class="bi bi-calendar-check"></i> HabitFlow</h5>
+    <button class="btn-close-sidebar d-lg-none" id="closeSidebar">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+  <nav class="sidebar-nav">
+    <a href="index.html" class="sidebar-link"><i class="bi bi-house-door"></i><span>Home</span></a>
+    <a href="analytics.html" class="sidebar-link"><i class="bi bi-graph-up"></i><span>Analytics</span></a>
+    <a href="pomodoro.html" class="sidebar-link"><i class="bi bi-clock-history"></i><span>Pomodoro</span></a>
+    <a href="biofeedback.html" class="sidebar-link active"><i class="bi bi-activity"></i><span>Biofeedback AI</span></a>
+    <button class="sidebar-link" id="exportBtnSidebar"><i class="bi bi-download"></i><span>Export Data</span></button>
+    <button class="sidebar-link" onclick="cloudSync.showLoginModal()"><i class="bi bi-cloud"></i><span>Cloud Sync</span></button>
+  </nav>
+  <div class="sidebar-calendar">
+    <div class="sidebar-calendar-header">
+      <button class="btn-calendar-nav" id="prevMonth"><i class="bi bi-chevron-left"></i></button>
+      <span class="calendar-title" id="calendarTitle"></span>
+      <button class="btn-calendar-nav" id="nextMonth"><i class="bi bi-chevron-right"></i></button>
+    </div>
+    <div class="calendar-grid" id="miniCalendar"></div>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+  <!-- Navbar -->
+  <nav class="navbar border-bottom px-3 py-2">
+    <button class="btn btn-link d-lg-none" id="toggleSidebar"><i class="bi bi-list fs-4"></i></button>
+    <span class="navbar-brand fw-bold ms-2">
+      <i class="bi bi-activity text-primary"></i> Biofeedback Intelligence
+    </span>
+    <div class="ms-auto d-flex gap-2">
+      <button id="themeToggle" class="btn btn-outline-secondary btn-sm">🌙</button>
+    </div>
+  </nav>
+
+  <div class="container-fluid py-4" style="max-width: 1200px;">
+
+    <!-- Hero -->
+    <div class="bio-hero">
+      <div class="bio-hero-content">
+        <div class="bio-badge"><i class="bi bi-cpu-fill"></i> AI-Powered · Biologically Grounded</div>
+        <h1>🧬 Habit–Biology Intelligence</h1>
+        <p>Understand the physiological mechanisms behind your habits. See how your daily actions affect your biological systems — and get AI predictions about where your health is headed.</p>
+      </div>
+    </div>
+
+    <!-- Stats Strip -->
+    <div class="bf-stats-strip">
+      <div class="bf-stat">
+        <div class="bf-stat-value" id="bf-avg-completion">—</div>
+        <div class="bf-stat-label">Avg Daily Completion</div>
+      </div>
+      <div class="bf-stat">
+        <div class="bf-stat-value" id="bf-consistency">—</div>
+        <div class="bf-stat-label">Consistency Score</div>
+      </div>
+      <div class="bf-stat">
+        <div class="bf-stat-value" id="bf-streak">—</div>
+        <div class="bf-stat-label">Current Streak</div>
+      </div>
+      <div class="bf-stat">
+        <div class="bf-stat-value" id="bf-sleep">—</div>
+        <div class="bf-stat-label">Avg Sleep (30 days)</div>
+      </div>
+      <div class="bf-stat">
+        <div class="bf-stat-value" id="bf-energy-proj">—</div>
+        <div class="bf-stat-label">Projected Completion</div>
+      </div>
+      <div class="bf-stat">
+        <div class="bf-stat-value" id="bf-trend-label" style="font-size:1rem;">—</div>
+        <div class="bf-stat-label">30-Day Trajectory</div>
+      </div>
+    </div>
+
+    <!-- Trend + Prediction -->
+    <div class="trend-section">
+      <div class="section-header mb-3">
+        <div class="section-header-icon" style="background:rgba(33,150,243,0.1)">📊</div>
+        <div>
+          <div class="section-title">Predictive Health Trajectory</div>
+          <div class="section-subtitle">Linear regression model on your last 30 days of habit data</div>
+        </div>
+      </div>
+      <div class="trend-row">
+        <div class="trend-canvas-wrap">
+          <div class="trend-label">30-Day Completion History</div>
+          <canvas id="trendCanvas" width="600" height="80"></canvas>
+        </div>
+        <div style="flex:1;min-width:220px;">
+          <div class="trend-label">Predicted Next 7 Days</div>
+          <div id="projectedBars">
+            <div class="text-muted small">Loading predictions...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Biological System Map -->
+    <div class="mb-4">
+      <div class="section-header">
+        <div class="section-header-icon" style="background:rgba(139,92,246,0.1)">🧬</div>
+        <div>
+          <div class="section-title">Biological System Impact Map</div>
+          <div class="section-subtitle">Your habits mapped to the physiological systems they affect</div>
+        </div>
+      </div>
+      <div class="row" id="bioSystemsGrid">
+        <div class="col-12 text-center py-4">
+          <div class="spinner-border text-primary"></div>
+          <p class="mt-2 text-muted">Mapping your habits to biological systems...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Analysis CTA -->
+    <div class="ai-cta-card">
+      <div style="font-size:3rem;margin-bottom:0.75rem;">🤖</div>
+      <h4>AI Habit Intelligence Analysis</h4>
+      <p>Claude will analyse your 30-day habit data and generate personalised biofeedback insights — including biological risks, opportunities, and precise health predictions grounded in physiology.</p>
+      <button class="ai-run-btn" id="runAIBtn">
+        <i class="bi bi-cpu"></i> Run AI Analysis
+      </button>
+    </div>
+
+    <!-- AI Results Panel (hidden until run) -->
+    <div id="aiPanel" class="d-none mb-4">
+      <div class="ai-panel-box">
+
+        <!-- Loading -->
+        <div id="aiLoading" class="text-center py-4 d-none">
+          <div class="spinner-border text-primary mb-3" style="width:3rem;height:3rem;"></div>
+          <p class="text-muted">Analysing your biological patterns with AI...</p>
+          <p class="text-muted small">Mapping habits → physiology → predictions</p>
+        </div>
+
+        <!-- Error -->
+        <div id="aiError" class="bio-alert bio-alert-warning d-none">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <span></span>
+        </div>
+
+        <!-- Content -->
+        <div id="aiContent" class="d-none">
+
+          <!-- Overall Assessment -->
+          <div class="section-header">
+            <div class="section-header-icon" style="background:rgba(99,102,241,0.1)">🧠</div>
+            <div>
+              <div class="section-title">Overall Biological Assessment</div>
+            </div>
+          </div>
+          <div id="ai-overall" class="mb-4"></div>
+
+          <!-- Warning / Opportunity -->
+          <div class="row mb-3">
+            <div class="col-md-6" id="ai-warning"></div>
+            <div class="col-md-6" id="ai-opportunity"></div>
+          </div>
+
+          <!-- System Insights -->
+          <div class="section-header">
+            <div class="section-header-icon" style="background:rgba(16,185,129,0.1)">🔬</div>
+            <div>
+              <div class="section-title">System-Level Insights</div>
+              <div class="section-subtitle">AI interpretation of your biological markers</div>
+            </div>
+          </div>
+          <div id="ai-sleep"></div>
+          <div id="ai-metabolic"></div>
+          <div id="ai-cognitive"></div>
+
+          <!-- Predictions -->
+          <div class="section-header mt-3">
+            <div class="section-header-icon" style="background:rgba(245,158,11,0.1)">📈</div>
+            <div>
+              <div class="section-title">Predictive Health Outcomes</div>
+              <div class="section-subtitle">AI-projected biological trends based on your current patterns</div>
+            </div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem;margin-bottom:1.5rem;">
+            <div class="prediction-row" style="font-size:0.75rem;opacity:0.6;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;border-bottom:2px solid var(--border);">
+              <div>Metric</div><div>Trend</div><div>Biological Reasoning</div>
+            </div>
+            <div id="ai-predictions"></div>
+          </div>
+
+          <!-- Action Items -->
+          <div class="section-header">
+            <div class="section-header-icon" style="background:rgba(236,72,153,0.1)">⚡</div>
+            <div>
+              <div class="section-title">Biologically-Grounded Actions</div>
+              <div class="section-subtitle">Evidence-based interventions to improve your health trajectory</div>
+            </div>
+          </div>
+          <div id="ai-actions"></div>
+
+          <div class="text-center mt-3">
+            <small class="text-muted">
+              <i class="bi bi-info-circle me-1"></i>
+              AI insights are based on your tracked habit data and general physiological research.
+              They are not medical advice. Consult a healthcare professional for personalised guidance.
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- About the model card -->
+    <div class="card mb-4">
+      <div class="card-header fw-bold">
+        <i class="bi bi-question-circle me-2"></i>How the Predictive Model Works
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <div class="d-flex gap-3 align-items-start">
+              <div style="font-size:2rem">📊</div>
+              <div>
+                <strong>Linear Regression</strong>
+                <p class="text-muted small mb-0">Fits a trend line to your 30-day completion data. The slope tells you whether you're improving, stable, or declining.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="d-flex gap-3 align-items-start">
+              <div style="font-size:2rem">🧬</div>
+              <div>
+                <strong>Biological Mapping</strong>
+                <p class="text-muted small mb-0">Each habit is matched to the physiological systems it affects — sleep to circadian rhythm, exercise to mitochondrial biogenesis, etc.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="d-flex gap-3 align-items-start">
+              <div style="font-size:2rem">🤖</div>
+              <div>
+                <strong>AI Synthesis</strong>
+                <p class="text-muted small mb-0">Claude interprets your data through a physiological lens and generates personalised biological risk/opportunity signals.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /container -->
+</div><!-- /main-content -->
+
+<div id="notificationBadge" class="notification-badge" style="display:none;"></div>
+
+<script src="../libs/bootstrap.bundle.min.js"></script>
+<script src="../js/routines-data.js"></script>
+<script src="../js/biofeedback.js"></script>
+
+<script>
+  // Theme
+  const themeToggle = document.getElementById('themeToggle');
+  const currentTheme = localStorage.getItem('theme') || 'light';
+  document.documentElement.setAttribute('data-theme', currentTheme);
+  themeToggle.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
+
+  themeToggle.addEventListener('click', () => {
+    const ct = document.documentElement.getAttribute('data-theme');
+    const nt = ct === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', nt);
+    localStorage.setItem('theme', nt);
+    themeToggle.textContent = nt === 'dark' ? '☀️' : '🌙';
+  });
+
+  // Sidebar toggle
+  document.getElementById('toggleSidebar')?.addEventListener('click', () => {
+    document.getElementById('sidebar').classList.add('show');
+  });
+  document.getElementById('closeSidebar')?.addEventListener('click', () => {
+    document.getElementById('sidebar').classList.remove('show');
+  });
+
+  // Mini calendar (basic)
+  (function() {
+    let cd = new Date();
+    function render() {
+      const y = cd.getFullYear(), m = cd.getMonth();
+      const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      document.getElementById('calendarTitle').textContent = `${months[m]} ${y}`;
+      const grid = document.getElementById('miniCalendar');
+      grid.innerHTML = '';
+      ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach(d => {
+        const el = document.createElement('div');
+        el.className = 'calendar-day-header';
+        el.textContent = d;
+        grid.appendChild(el);
+      });
+      const first = new Date(y, m, 1).getDay();
+      const days = new Date(y, m + 1, 0).getDate();
+      for (let i = 0; i < first; i++) {
+        const el = document.createElement('div');
+        el.className = 'calendar-day other-month';
+        grid.appendChild(el);
+      }
+      const today = new Date();
+      for (let i = 1; i <= days; i++) {
+        const el = document.createElement('div');
+        el.className = 'calendar-day' + (y === today.getFullYear() && m === today.getMonth() && i === today.getDate() ? ' today' : '');
+        el.textContent = i;
+        grid.appendChild(el);
+      }
+    }
+    render();
+    document.getElementById('prevMonth')?.addEventListener('click', () => { cd.setMonth(cd.getMonth() - 1); render(); });
+    document.getElementById('nextMonth')?.addEventListener('click', () => { cd.setMonth(cd.getMonth() + 1); render(); });
+  })();
+</script>
+
+<footer style="margin-top:2rem;padding:1.5rem 1rem;border-top:1px solid var(--border);text-align:center;color:var(--text);opacity:0.6;font-size:0.85rem;">
+  &copy; 2026 HabitFlow &nbsp;·&nbsp;
+  <a href="mailto:jintojoseph.jo@gmail.com" style="color:var(--primary);text-decoration:none;">
+    <i class="bi bi-envelope-fill"></i>
+  </a>
+</footer>
+</body>
+</html>
